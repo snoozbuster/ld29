@@ -39,6 +39,8 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// </summary>
         public bool IsActive { get; private set; }
 
+        public bool IsGrabbing { get { return grabber.IsGrabbing || grabber.IsUpdating; } }
+
         /// <summary>
         /// Owning space of the character.
         /// </summary>
@@ -178,8 +180,12 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                         //If there's a valid ray hit, then grab the connected object!
                         if(entityCollision != null && entityCollision.Entity.IsDynamic)
                         {
-                            grabber.Setup(entityCollision.Entity, raycastResult.HitData.Location);
-                            grabDistance = raycastResult.HitData.T;
+                            var tag = entityCollision.Entity.Tag as GameModel;
+                            if(tag != null && tag.Texture.GameProperties.Grabbable)
+                            {
+                                grabber.Setup(entityCollision.Entity, raycastResult.HitData.Location);
+                                grabDistance = raycastResult.HitData.T;
+                            }
                         }
                     }
 
@@ -200,11 +206,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
         bool RayCastFilter(BroadPhaseEntry entry)
         {
-            EntityCollidable e = entry as EntityCollidable;
-            if(e != null && e.Entity.Tag is GameModel)
-                return entry != CharacterController.Body.CollisionInformation && entry.CollisionRules.Personal <= CollisionRule.Normal
-                    && (e.Entity.Tag as GameModel).Texture.GameProperties.Grabbable;
-            return false;
+            return entry != CharacterController.Body.CollisionInformation && entry.CollisionRules.Personal <= CollisionRule.Normal;
         }
     }
 }

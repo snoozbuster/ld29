@@ -30,7 +30,7 @@ namespace LD29
         public Loader Loader { get; private set; }
 
         public SoundEffectInstance BGM;
-        CharacterControllerInput character;
+        Player character;
 
         public BaseGame()
         {
@@ -141,7 +141,7 @@ namespace LD29
                     {
                         GameManager.Space.Update((float)(gameTime.ElapsedGameTime.TotalSeconds));
 
-                        character.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+                        character.Update(gameTime);
 
                         if(IsActive)
                             Mouse.SetPosition(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
@@ -187,6 +187,7 @@ namespace LD29
         public void DrawScene(GameTime gameTime)
         {
             Renderer.Draw();
+            character.Draw();
         }
 
         public void Start()
@@ -240,7 +241,7 @@ namespace LD29
 
         private void createCharacter()
         {
-            character = new CharacterControllerInput(GameManager.Space, Renderer.Camera, this);
+            character = new Player(this);
             character.Activate();
         }
 
