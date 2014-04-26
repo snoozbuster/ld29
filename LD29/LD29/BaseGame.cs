@@ -1,16 +1,12 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
 using Accelerated_Delivery_Win;
 using MyExtensions = Accelerated_Delivery_Win.Extensions;
 using Microsoft.Win32;
+using BEPUphysicsDemos;
 
 namespace LD29
 {
@@ -69,8 +65,6 @@ namespace LD29
         protected override void LoadContent()
         {
             RenderingDevice.Initialize(Graphics, Program.Cutter, GameManager.Space, Content.Load<Effect>("shaders/shadowmap"));
-            //RenderingDevice.Camera = new CharacterCamera();
-            RenderingDevice.SetUpLighting(RenderingDevice.LightingData.Generic);
             MyExtensions.Initialize(GraphicsDevice);
             loadingScreen = new LoadingScreen(Content, GraphicsDevice);
             loadingSplash = Content.Load<Texture2D>("textures/loading");
@@ -140,7 +134,6 @@ namespace LD29
                     else
                     {
                         GameManager.Space.Update((float)(gameTime.ElapsedGameTime.TotalSeconds));
-                        RenderingDevice.Update(gameTime);
 
                         // todo: actual update logic
 
