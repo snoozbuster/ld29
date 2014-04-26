@@ -151,7 +151,7 @@ namespace BEPUphysicsDemos
         /// <param name="distance">Distance to move.</param>
         public void MoveUp(float distance)
         {
-            Position += new Vector3(0, distance, 0);
+            Position += new Vector3(0, 0, distance);
         }
 
 

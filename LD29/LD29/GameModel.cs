@@ -28,11 +28,13 @@ namespace LD29
         private GameTexture texture;
 
         public Vector3 Origin { get; protected set; }
-        public Matrix Transform { get; set; }
 
         public readonly bool CanBeRipped;
 
         public GameModel(Vector3 origin, Model m, GameTexture t, bool rippable = true)
+            :this(null, origin, m, t, rippable) { }
+
+        public GameModel(Entity e, Vector3 origin, Model m, GameTexture t, bool rippable = true)
         {
             Model = m;
             texture = t;
@@ -41,15 +43,20 @@ namespace LD29
 
             Model.Tag = this;
 
-            BEPUutilities.Vector3[] verts;
-            int[] indices;
-            ModelDataExtractor.GetVerticesAndIndicesFromModel(Model, out verts, out indices);
+            if(e == null)
+            {
+                BEPUutilities.Vector3[] verts;
+                int[] indices;
+                ModelDataExtractor.GetVerticesAndIndicesFromModel(Model, out verts, out indices);
 
-            Entity = new MobileMesh(verts, indices, BEPUutilities.AffineTransform.Identity, MobileMeshSolidity.DoubleSided, Texture.PhysicsProperties.Mass);
+                Entity = new MobileMesh(verts, indices, BEPUutilities.AffineTransform.Identity, MobileMeshSolidity.DoubleSided, Texture.PhysicsProperties.Mass);
+            }
+            else
+                Entity = e;
+
             Entity.Tag = this;
             Entity.CollisionInformation.Tag = this;
 
-            Transform = Matrix.CreateTranslation(-Entity.Position);
             Entity.Position += ConversionHelper.MathConverter.Convert(Origin);
 
             Texture.ApplyToModel(this, null); // sets rest of physics/game props
@@ -63,7 +70,7 @@ namespace LD29
                 throw new InvalidOperationException("Can't rip an unrippable texture!");
 
             GameTexture output = Texture;
-            Texture = new GameTexture(Texture.ActualTexture) { Wireframe = true };
+            Texture = new GameTexture("Wireframe", Texture.ActualTexture) { Wireframe = true };
             return output;
         }
 
@@ -87,7 +94,6 @@ namespace LD29
             oldSpace.Remove(Entity);
             oldSpace.DuringForcesUpdateables.Starting -= Texture.GameProperties.Update;
         }
-
 
         public Space Space { get; set; }
 

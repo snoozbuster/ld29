@@ -42,8 +42,17 @@ namespace BEPUphysicsDemos
             //Only turn if the mouse is controlled by the game.
             if (!Game.IsMouseVisible)
             {
-                Camera.Yaw((200 - Input.MouseState.X) * dt * .12f);
-                Camera.Pitch((200 - Input.MouseState.Y) * dt * .12f);
+                if(Input.ControlScheme == ControlScheme.Keyboard)
+                {
+                    Camera.Yaw((RenderingDevice.GraphicsDevice.Viewport.Width / 2 - Input.MouseState.X) * dt * .12f);
+                    Camera.Pitch(-(Input.MouseState.Y - RenderingDevice.GraphicsDevice.Viewport.Height / 2) * dt * .12f);
+                }
+            }
+            else if(Input.ControlScheme == ControlScheme.XboxController)
+            {
+                // todo: why was this originally done raw? relic?
+                Camera.Yaw(Input.CurrentPad.ThumbSticks.Right.X * -1.5f * dt);
+                Camera.Pitch(-Input.CurrentPad.ThumbSticks.Right.Y * 1.5f * dt);
             }
 #if DEBUG
             if(Input.CheckKeyboardPress(Keys.M))

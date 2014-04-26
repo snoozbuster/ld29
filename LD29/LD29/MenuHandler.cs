@@ -587,22 +587,18 @@ namespace LD29
             private const int smallerTime = 300;
             private const int largerTime = 750;
 
-            private readonly MenuControl start, instructions, ending;
-            private bool checkedReg = false;
-            private GameState? endingState = null;
+            private readonly MenuControl start, instructions;
 
             public MainMenu()
             {
                 MenuButton quit;
-                start = new MenuButton(loader.startButton, delegate { checkedReg = false; GameManager.State = GameState.Running; timerInMilliseconds = 0; Program.Game.Start(); });
-                instructions = new MenuButton(loader.instructionsButton, delegate { checkedReg = false; GameManager.State = GameState.Menuing_HiS; });
+                start = new MenuButton(loader.startButton, delegate { GameManager.State = GameState.Running; timerInMilliseconds = 0; Program.Game.Start(); });
+                instructions = new MenuButton(loader.instructionsButton, delegate { GameManager.State = GameState.Menuing_HiS; });
                 quit = new MenuButton(loader.quitButton, delegate { GameManager.State = GameState.Exiting; });
-                ending = new MenuButton(loader.endingButton, delegate { GameManager.State = (GameState)endingState; });
 
                 start.SetDirectionals(null, instructions, null, null);
                 instructions.SetDirectionals(start, quit, null, null);
                 quit.SetDirectionals(instructions, null, null, null);
-                ending.SetDirectionals(null, null, null, null);
                 controlArray.AddRange(new MenuControl[] { instructions, start, quit });
 
                 selectedControl = start;
@@ -634,9 +630,6 @@ namespace LD29
                     RenderingDevice.SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.LinearClamp, null, null);
                     RenderingDevice.SpriteBatch.Draw(loader.mainMenuBackground, new Vector2(0, 0), null, Color.White, 0, Vector2.Zero, RenderingDevice.TextureScaleFactor, SpriteEffects.None, 0);
                     RenderingDevice.SpriteBatch.Draw(loader.mainMenuLogo, new Vector2(RenderingDevice.Width * 0.5f, RenderingDevice.Height * 0.15f), null, Color.White, 0.0f, new Vector2(loader.mainMenuLogo.Width / 2, loader.mainMenuLogo.Height / 2), 0.75f * RenderingDevice.TextureScaleFactor, SpriteEffects.None, 0);
-                    if(controlArray.Contains(ending))
-                        RenderingDevice.SpriteBatch.DrawString(loader.BiggerFont, "Are you happy with your ending? Watch it again below.", new Vector2(RenderingDevice.Width * 0.5f, RenderingDevice.Height * 0.6f), Color.White, 0,
-                            loader.BiggerFont.MeasureString("Are you happy with your ending? Watch it again below.") * 0.5f, 1, SpriteEffects.None, 0);
                     base.Draw(gameTime);
                     RenderingDevice.SpriteBatch.End();
                 }
@@ -656,7 +649,7 @@ namespace LD29
                         Input.PlayerSelect(Program.Game.IsActive);
                         if(Input.MessagePad != null)
                         {
-                            MediaSystem.PlaySoundEffect(SFXOptions.Box_Success);
+                            //MediaSystem.PlaySoundEffect(SFXOptions.Box_Success);
                             MouseTempDisabled = true;
                             startBeenPressed = true;
                             timer = 1200;
@@ -666,22 +659,6 @@ namespace LD29
                     }
                     else if(Input.MessagePad != null && timer <= 0)
                     {
-                        if(!checkedReg)
-                        {
-                            using(RegistryKey k1 = Registry.CurrentUser.OpenSubKey("Software"))
-                            using(RegistryKey k2 = k1.OpenSubKey("LD28_Travesty"))
-                                if(k2 != null)
-                                    endingState = (GameState)k2.GetValue("ending", 0);
-                            if(endingState != null && endingState.Value == 0)
-                                endingState = null;
-                            checkedReg = true;
-                        }
-                        if(endingState.HasValue && controlArray.Contains(start))
-                        {
-                            controlArray.Clear();
-                            controlArray.Add(ending);
-                            ending.IsSelected = null;
-                        }
                         if(Input.CheckKeyboardJustPressed(Keys.Escape) || Input.CheckXboxJustPressed(Buttons.B))
                         {
                             ReturnToPressStart();
@@ -697,7 +674,7 @@ namespace LD29
                 Input.NullMessagePad();
                 startBeenPressed = false;
                 ResetTimer();
-                MediaSystem.PlaySoundEffect(SFXOptions.Box_Death);
+                //MediaSystem.PlaySoundEffect(SFXOptions.Box_Death);
             }
 
             internal void ResetTimer()

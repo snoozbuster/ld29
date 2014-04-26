@@ -15,16 +15,16 @@ namespace LD29
         public float Bounciness { get { return bounciness.GetValueOrDefault();  } } // returns 0 if null
         private float? bounciness;
 
-        public float StaticFriction { get { return staticFriction.HasValue ? staticFriction.Value : 0.5f; } }
+        public float StaticFriction { get { return staticFriction.HasValue ? staticFriction.Value : 0.6f; } }
         private float? staticFriction;
 
         public float KineticFriction { get { return kineticFriction.HasValue ? kineticFriction.Value : 0.5f; } }
         private float? kineticFriction;
 
-        public float Mass { get { return mass.HasValue ? mass.Value : 5; } }
+        public float Mass { get { return mass.HasValue ? mass.Value : float.NegativeInfinity; } }
         private float? mass;
 
-        public bool IsAffectedByGravity { get { return isAffectedByGravity.HasValue ? isAffectedByGravity.Value : true; } }
+        public bool IsAffectedByGravity { get { return isAffectedByGravity.GetValueOrDefault(); } }
         private bool? isAffectedByGravity;
 
         public bool HasCollision { get { return hasCollision.HasValue ? hasCollision.Value : true; } }
@@ -65,7 +65,7 @@ namespace LD29
     {
         private static Action emptyFunction = delegate { };
 
-        public InitialCollisionDetectedEventHandler<EntityCollidable>[] CollisionHandlers { get { return collisionHandlers; } }
+        public InitialCollisionDetectedEventHandler<EntityCollidable>[] CollisionHandlers { get { if(collisionHandlers == null) collisionHandlers = new InitialCollisionDetectedEventHandler<EntityCollidable>[] { }; return collisionHandlers; } }
         private InitialCollisionDetectedEventHandler<EntityCollidable>[] collisionHandlers;
 
         public Action Update { get { return update == null ? emptyFunction : update; } }

@@ -40,6 +40,12 @@ namespace LD29
             Camera = new Camera(g);
         }
 
+        public static void Clear()
+        {
+            models.Clear();
+            multiMeshModel.Clear();
+        }
+
         public static void Add(GameModel model)
         {
             if(models.ContainsKey(model))
@@ -58,13 +64,35 @@ namespace LD29
 
         public static void Add(Model model)
         {
+            List<Texture2D> list = new List<Texture2D>();
+            foreach(ModelMesh mesh in model.Meshes)
+                for(int i = 0; i < mesh.Effects.Count; i++)
+                {
+                    BasicEffect currentEffect = mesh.Effects[i] as BasicEffect;
+                    EffectParameter e;
+                    if(currentEffect != null)
+                        list.Add(currentEffect.Texture);
+                    else if((e = mesh.Effects[i].Parameters.FirstOrDefault(v => { return v.Name == "Texture"; })) != null)
+                        list.Add(e.GetValueTexture2D());
 
+                    if(mesh.Effects[i] is BasicEffect)
+                        foreach(ModelMeshPart meshPart in mesh.MeshParts)
+                            meshPart.Effect = shader.Clone();
+                }
+            multiMeshModel.Add(new ModelData(model, list));
         }
 
         public static void Remove(GameModel model)
         {
             if(models.ContainsKey(model))
                 models[model] = false;
+        }
+
+        public static void Remove(Model model)
+        {
+            foreach(ModelData m in multiMeshModel)
+                if(m.Model == model)
+                    m.Active = false;
         }
 
         public static void Draw()
@@ -75,7 +103,7 @@ namespace LD29
 
         private static void draw(Plane? clipPlane, Matrix view)
         {
-            List<ModelMesh> transparentMeshes = new List<ModelMesh>();
+            List<GameModel> transparentMeshes = new List<GameModel>();
 
             setForTextured();
             foreach(KeyValuePair<GameModel, bool> m in models)
@@ -84,8 +112,9 @@ namespace LD29
                     if(!m.Key.Texture.GraphicsProperties.Transparent)
                         drawMesh(m.Key.Model.Meshes[0], m.Key, "ShadowedScene", clipPlane, view);
                     else
-                        transparentMeshes.Add(m.Key.Model.Meshes[0]);
+                        transparentMeshes.Add(m.Key);
                 }
+            drawMultiMeshes(clipPlane, view);
 
             setForWireframe();
             foreach(KeyValuePair<GameModel, bool> m in models)
@@ -94,26 +123,56 @@ namespace LD29
 
 #if DEBUG
             drawAxes();
-            if(Camera.Debug)
-                foreach(Entity e in Space.Entities)
-                    MathConverter.Convert(e.CollisionInformation.BoundingBox).Draw();
+            //if(Camera.Debug)
+            //    foreach(Entity e in Space.Entities)
+            //        e.CollisionInformation.BoundingBox.Draw();
 #endif
 
             setForTransparency();
-            foreach(KeyValuePair<GameModel, bool> m in models)
-                if(m.Value && !m.Key.Texture.Wireframe && m.Key.Texture.GraphicsProperties.Transparent)
-                    drawMesh(m.Key.Model.Meshes[0], m.Key, "ShadowedScene", clipPlane, view);
-
+            transparentMeshes.Sort(new Comparison<GameModel>(sortGlassList));
+            transparentMeshes.Reverse();
+            foreach(GameModel m in transparentMeshes)
+                drawMesh(m.Model.Meshes[0], m, "ShadowedScene", clipPlane, view);
         }
 
-        private static int sortGlassList(ModelMesh x, ModelMesh y)
+        private static int sortGlassList(GameModel x, GameModel y)
         {
             Vector3 pos1, pos2;
-            pos1 = x.ParentBone.Transform.Translation;
-            pos2 = y.ParentBone.Transform.Translation;
+            pos1 = x.Model.Meshes[0].ParentBone.Transform.Translation;
+            pos2 = y.Model.Meshes[0].ParentBone.Transform.Translation;
             float pos1Distance = Vector3.Distance(pos1, RenderingDevice.Camera.Position);
             float pos2Distance = Vector3.Distance(pos2, RenderingDevice.Camera.Position);
             return pos1Distance.CompareTo(pos2Distance);
+        }
+
+        private static void drawMultiMeshes(Plane? clipPlane, Matrix view)
+        {
+            foreach(ModelData m in multiMeshModel)
+            {
+                int i = 0;
+                foreach(ModelMesh mesh in m.Model.Meshes)
+                {
+                    foreach(Effect currentEffect in mesh.Effects)
+                    {
+                        currentEffect.CurrentTechnique = currentEffect.Techniques["ShadowedScene"];
+
+                        currentEffect.Parameters["Texture"].SetValue(m.Textures[i++]);
+
+                        currentEffect.Parameters["xCamerasViewProjection"].SetValue(view * MathConverter.Convert(Camera.ProjectionMatrix));
+                        currentEffect.Parameters["xWorld"].SetValue(mesh.ParentBone.Transform);// * Camera.World);
+                        currentEffect.Parameters["xPassThroughLighting"].SetValue(true);
+
+                        if(clipPlane.HasValue)
+                        {
+                            currentEffect.Parameters["xEnableClipping"].SetValue(true);
+                            currentEffect.Parameters["xClipPlane"].SetValue(new Vector4(clipPlane.Value.Normal, clipPlane.Value.D));
+                        }
+                        else
+                            currentEffect.Parameters["xEnableClipping"].SetValue(false);
+                    }
+                    mesh.Draw();
+                }
+            }
         }
 
         private static void drawMesh(ModelMesh mesh, GameModel model, string tech, Plane? clipPlane, Matrix view)
@@ -126,7 +185,7 @@ namespace LD29
                 currentEffect.Parameters["Texture"].SetValue(model.Texture.ActualTexture);
 
                 currentEffect.Parameters["xCamerasViewProjection"].SetValue(view * MathConverter.Convert(Camera.ProjectionMatrix));
-                currentEffect.Parameters["xWorld"].SetValue(mesh.ParentBone.Transform * model.Transform * entityWorld);// * Camera.World);
+                currentEffect.Parameters["xWorld"].SetValue(mesh.ParentBone.Transform * entityWorld);// * Camera.World);
                 currentEffect.Parameters["xPassThroughLighting"].SetValue(true);
                 //currentEffect.Parameters["xLightPos"].SetValue(lights.LightPosition);
                 //currentEffect.Parameters["xLightPower"].SetValue(0.4f);
@@ -167,7 +226,7 @@ namespace LD29
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
         }
 
-        private static class ModelData
+        private class ModelData
         {
             public Model Model;
             public List<Texture2D> Textures;
@@ -179,9 +238,6 @@ namespace LD29
                 Model = m;
                 Textures = t;
             }
-
-            public void Deactivate() { Active = false; }
-            public void Activate() { Active = true; }
         }
 
         /// <summary>

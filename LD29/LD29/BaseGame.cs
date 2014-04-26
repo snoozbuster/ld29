@@ -7,6 +7,10 @@ using Accelerated_Delivery_Win;
 using MyExtensions = Accelerated_Delivery_Win.Extensions;
 using Microsoft.Win32;
 using BEPUphysicsDemos;
+using BEPUphysics.CollisionShapes;
+using BEPUphysics.Entities.Prefabs;
+using BEPUphysicsDemos.AlternateMovement.Character;
+using BEPUphysics.Entities;
 
 namespace LD29
 {
@@ -26,6 +30,7 @@ namespace LD29
         public Loader Loader { get; private set; }
 
         public SoundEffectInstance BGM;
+        CharacterControllerInput character;
 
         public BaseGame()
         {
@@ -65,14 +70,15 @@ namespace LD29
         protected override void LoadContent()
         {
             RenderingDevice.Initialize(Graphics, Program.Cutter, GameManager.Space, Content.Load<Effect>("shaders/shadowmap"));
+            Renderer.Initialize(Graphics, this, GameManager.Space, Content.Load<Effect>("shaders/shadowmap"));
             MyExtensions.Initialize(GraphicsDevice);
             loadingScreen = new LoadingScreen(Content, GraphicsDevice);
-            loadingSplash = Content.Load<Texture2D>("textures/loading");
+            loadingSplash = Content.Load<Texture2D>("gui/loading");
 
-            //SoundEffect e = Content.Load<SoundEffect>("music/main");
-            //BGM = e.CreateInstance();
-            //BGM.IsLooped = true;
-            //BGM.Play();
+            SoundEffect e = Content.Load<SoundEffect>("music/main");
+            BGM = e.CreateInstance();
+            BGM.IsLooped = true;
+            BGM.Play();
 
             GameManager.Initialize(null, Content.Load<SpriteFont>("font/font"), null);
         }
@@ -135,7 +141,7 @@ namespace LD29
                     {
                         GameManager.Space.Update((float)(gameTime.ElapsedGameTime.TotalSeconds));
 
-                        // todo: actual update logic
+                        character.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
 
                         if(IsActive)
                             Mouse.SetPosition(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
@@ -180,16 +186,69 @@ namespace LD29
 
         public void DrawScene(GameTime gameTime)
         {
-
+            Renderer.Draw();
         }
 
         public void Start()
         {
+            buildRoom();
+            addModels();
+            createCharacter();
+        }
 
+        private void buildRoom()
+        {
+            Renderer.Add(Loader.Room);
+
+            BEPUutilities.Vector3[] verts;
+            int[] indices;
+            ModelDataExtractor.GetVerticesAndIndicesFromModel(Loader.Room, out verts, out indices);
+
+            Entity e = new MobileMesh(verts, indices, BEPUutilities.AffineTransform.Identity, MobileMeshSolidity.DoubleSided);
+            e.CollisionInformation.CollisionRules.Group = GameModel.NormalGroup;
+
+            GameManager.Space.Add(e);
+        }
+
+        private void addModels()
+        {
+            GameModel tree = new GameModel(new Vector3(5, 5, 1.1f), Loader.Tree,
+                new GameTexture("Tree", Loader.TreeTexture,
+                    new PhysicsProperties(null, 0.9f, 0.8f, null, true, null),
+                    new GameProperties(null, false),
+                    new GraphicsProperties(null, true)));
+            GameModel ball = new GameModel(new BEPUphysics.Entities.Prefabs.Sphere(new Vector3(3, -2, 3), 1), Vector3.Zero, Loader.Ball,
+                new GameTexture("Beach ball", Loader.BallTexture,
+                    new PhysicsProperties(1.2f, 0.3f, 0.2f, 0.1f, true, true)));
+            GameModel orange = new GameModel(new BEPUphysics.Entities.Prefabs.Sphere(new Vector3(-7, 4, 1), 1), Vector3.Zero, Loader.Orange,
+                new GameTexture("Orange", Loader.OrangeTexture,
+                    new PhysicsProperties(0.1f, null, null, 2f, true, true)));
+            GameModel anvil = new GameModel(new Vector3(-2, -6, 0.7f), Loader.Anvil,
+                new GameTexture("Anvil", Loader.AnvilTexture,
+                    new PhysicsProperties(null, null, null, 15000, true, true),
+                    new GameProperties(null, false)));
+
+            Renderer.Add(tree);
+            Renderer.Add(ball);
+            Renderer.Add(orange);
+            Renderer.Add(anvil);
+            GameManager.Space.Add(tree);
+            GameManager.Space.Add(ball);
+            GameManager.Space.Add(orange);
+            GameManager.Space.Add(anvil);
+        }
+
+        private void createCharacter()
+        {
+            character = new CharacterControllerInput(GameManager.Space, Renderer.Camera, this);
+            character.Activate();
         }
 
         public void End()
         {
+            character.Deactivate();
+            GameManager.Space.Clear();
+            Renderer.Clear();
         }
 
         #region windows
@@ -198,8 +257,8 @@ namespace LD29
         {
             if(GameManager.PreviousState == GameState.Running)
                 GameManager.State = GameState.Running;
-            //BGM.Resume();
-            //BGM.Volume = 1;
+            BGM.Resume();
+            BGM.Volume = 1;
 
             base.OnActivated(sender, args);
         }
@@ -208,7 +267,7 @@ namespace LD29
         {
             if(GameManager.State == GameState.Running)
                 GameManager.State = GameState.Paused;
-            //BGM.Pause();
+            BGM.Pause();
 
             base.OnDeactivated(sender, args);
         }

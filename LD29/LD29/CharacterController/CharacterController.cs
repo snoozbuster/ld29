@@ -71,14 +71,14 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 else
                     Vector3.Divide(ref value, (float)Math.Sqrt(lengthSquared), out value);
                 Vector3 unitZ = -Toolbox.BackVector;
-                Quaternion.GetQuaternionBetweenNormalizedVectors(ref unitZ, ref value, out orientation);
+                Quaternion.GetQuaternionBetweenNormalizedVectors(ref Toolbox.DownVector, ref value, out orientation);
                 Body.Orientation = orientation;
                 UpdateHorizontalViewDirection();
             }
         }
 
-        Vector3 viewDirection = new Vector3(1, 0, 0);
-        Vector3 horizontalViewDirection = new Vector3(1, 0, 0);
+        Vector3 viewDirection = new Vector3(0, -1, 0);
+        Vector3 horizontalViewDirection = new Vector3(0, -1, 0);
 
         /// <summary>
         /// Gets the horizontal view direction computed using the Down vector and the ViewDirection.
@@ -232,6 +232,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         public CharacterController(Vector3 position, float height, float crouchingHeight, float radius, float mass)
         {
             Body = new Cylinder(position, height, radius, mass);
+            //Body.Orientation = Quaternion.CreateFromAxisAngle(Vector3.UnitX, MathHelper.PiOver2); // reset to Z up
             Body.IgnoreShapeChanges = true; //Wouldn't want inertia tensor recomputations to occur when crouching and such.
             Body.CollisionInformation.Shape.CollisionMargin = .1f;
             //Making the character a continuous object prevents it from flying through walls which would be pretty jarring from a player's perspective.

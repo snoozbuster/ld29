@@ -58,7 +58,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
             CharacterController = new CharacterController();
             Camera = camera;
             CameraControlScheme = new CharacterCameraControlScheme(CharacterController, camera, game);
-
+            grabber = new MotorizedGrabSpring();
             Space = owningSpace;
         }
 
@@ -99,7 +99,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// <param name="keyboardInput">The current frame's keyboard state.</param>
         /// <param name="previousGamePadInput">The last frame's gamepad state.</param>
         /// <param name="gamePadInput">The current frame's keyboard state.</param>
-        public void Update(float dt, KeyboardState previousKeyboardInput, KeyboardState keyboardInput, GamePadState previousGamePadInput, GamePadState gamePadInput)
+        public void Update(float dt)
         {
             if (IsActive)
             {
@@ -127,19 +127,19 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
                 //Collect the movement impulses.
 
-                if (keyboardInput.IsKeyDown(Keys.W))
+                if (Input.KeyboardState.IsKeyDown(Keys.W))
                 {
                     totalMovement += new Vector2(0, 1);
                 }
-                if (keyboardInput.IsKeyDown(Keys.S))
+                if(Input.KeyboardState.IsKeyDown(Keys.S))
                 {
                     totalMovement += new Vector2(0, -1);
                 }
-                if (keyboardInput.IsKeyDown(Keys.A))
+                if(Input.KeyboardState.IsKeyDown(Keys.A))
                 {
                     totalMovement += new Vector2(-1, 0);
                 }
-                if (keyboardInput.IsKeyDown(Keys.D))
+                if(Input.KeyboardState.IsKeyDown(Keys.D))
                 {
                     totalMovement += new Vector2(1, 0);
                 }
@@ -149,10 +149,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     CharacterController.HorizontalMotionConstraint.MovementDirection = Vector2.Normalize(totalMovement);
 
 
-                CharacterController.StanceManager.DesiredStance = keyboardInput.IsKeyDown(Keys.Z) ? Stance.Crouching : Stance.Standing;
+                CharacterController.StanceManager.DesiredStance = Input.KeyboardState.IsKeyDown(Keys.LeftShift) ? Stance.Crouching : Stance.Standing;
 
                 //Jumping
-                if (previousKeyboardInput.IsKeyUp(Keys.A) && keyboardInput.IsKeyDown(Keys.A))
+                if(Input.KeyboardLastFrame.IsKeyUp(Keys.Space) && Input.KeyboardState.IsKeyDown(Keys.Space))
                 {
                     CharacterController.Jump();
                 }
@@ -167,12 +167,12 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 #if !WINDOWS
             if (Game.GamePadInput.IsButtonDown(Buttons.RightShoulder) && !grabber.IsUpdating)
 #else
-                if(Input.MouseState.RightButton == ButtonState.Pressed && !grabber.IsGrabbing)
+                if(Input.CheckKeyboardPress(Keys.E) && !grabber.IsGrabbing)
 #endif
                 {
                     //Find the earliest ray hit
                     RayCastResult raycastResult;
-                    if(Space.RayCast(new Ray(Renderer.Camera.Position, Renderer.Camera.WorldMatrix.Forward), 10, rayCastFilter, out raycastResult))
+                    if(Space.RayCast(new Ray(Renderer.Camera.Position, Renderer.Camera.WorldMatrix.Forward), 10, RayCastFilter, out raycastResult))
                     {
                         var entityCollision = raycastResult.HitObject as EntityCollidable;
                         //If there's a valid ray hit, then grab the connected object!
@@ -187,28 +187,24 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 #if !WINDOWS
             if (Game.GamePadInput.IsButtonDown(Buttons.RightShoulder) && grabber.IsUpdating)
 #else
-                else if(Input.MouseState.RightButton == ButtonState.Pressed && grabber.IsUpdating)
+                else if(grabber.IsUpdating)
 #endif
                 {
+                    if(Input.CheckKeyboardPress(Keys.E))
+                        grabber.Release();
                     grabber.GoalPosition = Renderer.Camera.Position + Renderer.Camera.WorldMatrix.Forward * grabDistance;
-                }
-#if !WINDOWS
-            if (!Game.GamePadInput.IsButtonDown(Buttons.RightShoulder) && grabber.IsUpdating)
-#else
-                else if(Input.MouseState.RightButton == ButtonState.Released && grabber.IsUpdating)
-#endif
-                {
-                    grabber.Release();
                 }
                 #endregion
             }
         }
 
-        Func<BroadPhaseEntry, bool> rayCastFilter;
         bool RayCastFilter(BroadPhaseEntry entry)
         {
-            return entry != CharacterController.Body.CollisionInformation && entry.CollisionRules.Personal <= CollisionRule.Normal
-                && (entry.Tag as GameModel).Texture.GameProperties.Grabbable;
+            EntityCollidable e = entry as EntityCollidable;
+            if(e != null && e.Entity.Tag is GameModel)
+                return entry != CharacterController.Body.CollisionInformation && entry.CollisionRules.Personal <= CollisionRule.Normal
+                    && (e.Entity.Tag as GameModel).Texture.GameProperties.Grabbable;
+            return false;
         }
     }
 }

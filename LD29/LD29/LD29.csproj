@@ -90,7 +90,6 @@
     <Compile Include="GameTexture.cs" />
     <Compile Include="Loader.cs" />
     <Compile Include="LoadingScreen.cs" />
-    <Compile Include="MathConverter.cs" />
     <Compile Include="MenuHandler.cs" />
     <Compile Include="ModelDataExtractor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

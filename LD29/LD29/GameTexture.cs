@@ -14,9 +14,11 @@ namespace LD29
         public GameProperties GameProperties { get; private set; }
         public GraphicsProperties GraphicsProperties { get; private set; }
         public PhysicsProperties PhysicsProperties { get; private set; }
+        public string FriendlyName { get; private set; }
 
-        public GameTexture(Texture2D texture, PhysicsProperties pp = new PhysicsProperties(), GameProperties gp = new GameProperties(), GraphicsProperties ggp = new GraphicsProperties())
+        public GameTexture(string name, Texture2D texture, PhysicsProperties pp = new PhysicsProperties(), GameProperties gp = new GameProperties(), GraphicsProperties ggp = new GraphicsProperties())
         {
+            FriendlyName = name;
             ActualTexture = texture;
             PhysicsProperties = pp;
             GameProperties = gp;
