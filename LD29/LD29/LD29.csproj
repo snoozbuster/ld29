@@ -45,14 +45,20 @@
     <XnaCompressContent>true</XnaCompressContent>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Accelerated_Delivery">
-      <HintPath>..\..\..\LD28\LD28\LD28\AD_Core\Accelerated_Delivery.dll</HintPath>
+    <Reference Include="Accelerated_Delivery, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>AD_core\Accelerated_Delivery.dll</HintPath>
     </Reference>
-    <Reference Include="BEPUphysics">
-      <HintPath>..\..\..\LD28\LD28\LD28\BEPU\BEPUphysics.dll</HintPath>
+    <Reference Include="BEPUik">
+      <HintPath>AD_core\BEPUik.dll</HintPath>
     </Reference>
-    <Reference Include="BEPUutilities">
-      <HintPath>..\..\..\Accelerated_Delivery_Win\Accelerated_Delivery_Win\BEPUphysics\x86\Release\BEPUutilities.dll</HintPath>
+    <Reference Include="BEPUphysics, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31f6a8732a21de19, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>AD_core\BEPUphysics.dll</HintPath>
+    </Reference>
+    <Reference Include="BEPUutilities, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31f6a8732a21de19, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>AD_core\BEPUutilities.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="Microsoft.Xna.Framework.Game, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />

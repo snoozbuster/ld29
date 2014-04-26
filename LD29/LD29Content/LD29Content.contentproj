@@ -29,7 +29,7 @@
     <Reference Include="Microsoft.Xna.Framework.Content.Pipeline.AudioImporters, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Xna.Framework.Content.Pipeline.VideoImporters, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=MSIL" />
     <Reference Include="NormalMappingEffectPipeline">
-      <HintPath>..\..\..\..\Tutorials\NormalMappingSample_4_0\NormalMappingEffectPipeline\bin\x86\Debug\NormalMappingEffectPipeline.dll</HintPath>
+      <HintPath>..\LD29\AD_core\NormalMappingEffectPipeline.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
