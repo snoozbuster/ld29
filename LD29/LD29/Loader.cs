@@ -18,7 +18,7 @@ namespace LD29
         public SpriteFont Font;
         #endregion
 
-        #region textures
+        #region gui
         public Texture2D halfBlack;
         public Texture2D EmptyTex;
 
@@ -28,6 +28,8 @@ namespace LD29
 
         public Texture2D Instructions_Xbox;
         public Texture2D Instructions_PC;
+
+        public Texture2D Dock;
         #endregion
 
         #region Buttons
@@ -63,7 +65,7 @@ namespace LD29
 
         public IEnumerator<float> GetEnumerator()
         {
-            totalItems = 8 + 2 + 5 + 4;
+            totalItems = 9 + 2 + 5 + 4;
 
             #region Font
             Font = content.Load<SpriteFont>("font/font");
@@ -72,7 +74,7 @@ namespace LD29
             yield return progress();
             #endregion
 
-            #region textures
+            #region gui
             EmptyTex = new Texture2D(RenderingDevice.GraphicsDevice, 1, 1);
             EmptyTex.SetData(new[] { Color.White });
             yield return progress();
@@ -103,6 +105,8 @@ namespace LD29
             Instructions_PC = content.Load<Texture2D>("gui/instructions_pc");
             yield return progress();
 
+            Dock = content.Load<Texture2D>("gui/dock");
+            yield return progress();
             #endregion
 
             #region models

@@ -649,7 +649,7 @@ namespace LD29
                         Input.PlayerSelect(Program.Game.IsActive);
                         if(Input.MessagePad != null)
                         {
-                            //MediaSystem.PlaySoundEffect(SFXOptions.Box_Success);
+                            MediaSystem.PlaySoundEffect(SFXOptions.Box_Success);
                             MouseTempDisabled = true;
                             startBeenPressed = true;
                             timer = 1200;

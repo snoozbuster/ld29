@@ -5,6 +5,7 @@ using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysicsDemos.AlternateMovement.Character;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,23 +19,63 @@ namespace LD29
         private GameTexture[] heldTextures = new GameTexture[5];
         private int textureIndex = 2;
 
+        private GameTexture targetedTexture;
+
         private bool canTakeTextures { get { if(character.IsGrabbing) return false; for(int i = 0; i < heldTextures.Length; i++) if(heldTextures[i] == null) return true; return false; } }
+
+        private Sprite dockTex;
+        private SpriteFont font;
+
+        private Rectangle[] drawingRectangles = new Rectangle[5];
 
         public Player(BaseGame g)
         {
             character = new CharacterControllerInput(GameManager.Space, Renderer.Camera, g);
+            dockTex = new Sprite(delegate { return g.Loader.Dock; }, new Vector2(RenderingDevice.Width / 2, RenderingDevice.Height * 0.95f), null, Sprite.RenderPoint.Center);
+            font = g.Loader.Font;
+
+            int add = 0;
+            for(int i = 0; i < drawingRectangles.Length; i++)
+            {
+                add += 10;
+                drawingRectangles[i] = new Rectangle((int)dockTex.UpperLeft.X + add, (int)dockTex.UpperLeft.Y - 140, 150, 150);
+                add += 150;
+                add += 10;
+            }
         }
 
         public void Draw()
         {
-            // draw ui
+            RenderingDevice.SpriteBatch.Begin();
+
+            dockTex.Draw();
+            if(targetedTexture != null)
+            {
+                Vector2 length = font.MeasureString(targetedTexture.FriendlyName);
+                RenderingDevice.SpriteBatch.DrawString(font, targetedTexture.FriendlyName, dockTex.UpperLeft - new Vector2(75 + length.X / 2, -2), Color.Black, 0, new Vector2(length.X / 2, 0), 1, SpriteEffects.None, 0);
+            }
+            if(heldTextures[textureIndex] != null)
+                RenderingDevice.SpriteBatch.DrawString(font, heldTextures[textureIndex].FriendlyName, new Vector2(dockTex.LowerRight.X, dockTex.UpperLeft.Y) + new Vector2(50, 0), Color.Black);
+
+            for(int i = 0; i < heldTextures.Length; i++)
+                if(heldTextures[i] != null && i != textureIndex)
+                    RenderingDevice.SpriteBatch.Draw(heldTextures[i].ActualTexture, drawingRectangles[i], Color.White);
+            if(heldTextures[textureIndex] != null)
+            {
+                Rectangle newRect = drawingRectangles[textureIndex];
+                newRect.Inflate(20, 20);
+                newRect.Y -= 20;
+                RenderingDevice.SpriteBatch.Draw(heldTextures[textureIndex].ActualTexture, newRect, Color.White);
+            }
+
+            RenderingDevice.SpriteBatch.End();
         }
 
         public void Update(GameTime gameTime)
         {
             character.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
 
-            GameTexture targetedTexture = null;
+            targetedTexture = null;
             GameModel targetedModel = null;
             //Find the earliest ray hit
             RayCastResult raycastResult;
@@ -51,7 +92,7 @@ namespace LD29
             }
 
             int mouseScroll = Input.MouseState.ScrollWheelValue - Input.MouseLastFrame.ScrollWheelValue;
-            int indexDirection = Math.Sign(mouseScroll);
+            int indexDirection = -Math.Sign(mouseScroll);
             if(indexDirection != 0)
             {
                 int originalIndex = textureIndex;

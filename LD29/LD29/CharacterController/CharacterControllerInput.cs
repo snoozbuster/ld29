@@ -184,7 +184,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                             if(tag != null && tag.Texture.GameProperties.Grabbable)
                             {
                                 grabber.Setup(entityCollision.Entity, raycastResult.HitData.Location);
-                                grabDistance = raycastResult.HitData.T;
+                                grabDistance = 3.5f;
                             }
                         }
                     }

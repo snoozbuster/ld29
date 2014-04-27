@@ -85,7 +85,7 @@
     <Compile Include="music\sfx\Box_Death.wma">
       <Name>Box_Death</Name>
       <Importer>WmaImporter</Importer>
-      <Processor>SongProcessor</Processor>
+      <Processor>SoundEffectProcessor</Processor>
     </Compile>
     <Compile Include="music\sfx\Button_Depress.wav">
       <Name>Button_Depress</Name>
@@ -130,7 +130,7 @@
     <Compile Include="music\sfx\Possible_Box_Success.wma">
       <Name>Possible_Box_Success</Name>
       <Importer>WmaImporter</Importer>
-      <Processor>SongProcessor</Processor>
+      <Processor>SoundEffectProcessor</Processor>
     </Compile>
   </ItemGroup>
   <ItemGroup>

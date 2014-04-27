@@ -71,6 +71,7 @@ namespace LD29
 
             GameTexture output = Texture;
             Texture = new GameTexture("Wireframe", Texture.ActualTexture) { Wireframe = true };
+            Entity.AngularVelocity = Entity.LinearVelocity = Vector3.Zero;
             return output;
         }
 
