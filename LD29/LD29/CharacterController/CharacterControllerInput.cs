@@ -178,13 +178,17 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     {
                         var entityCollision = raycastResult.HitObject as EntityCollidable;
                         //If there's a valid ray hit, then grab the connected object!
-                        if(entityCollision != null && entityCollision.Entity.IsDynamic)
+                        if(entityCollision != null)
                         {
                             var tag = entityCollision.Entity.Tag as GameModel;
-                            if(tag != null && tag.Texture.GameProperties.Grabbable)
+                            if(tag != null)
                             {
-                                grabber.Setup(entityCollision.Entity, raycastResult.HitData.Location);
-                                grabDistance = 3.5f;
+                                tag.Texture.GameProperties.RayCastHit();
+                                if(tag.Texture.GameProperties.Grabbable)
+                                {
+                                    grabber.Setup(entityCollision.Entity, raycastResult.HitData.Location);
+                                    grabDistance = 3.5f;
+                                }
                             }
                         }
                     }

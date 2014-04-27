@@ -73,6 +73,7 @@
     <Reference Include="System.Net" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnimatedTexture.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="CharacterController\CameraControlScheme.cs" />
     <Compile Include="CharacterController\CharacterCameraControlScheme.cs" />

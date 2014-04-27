@@ -71,20 +71,24 @@ namespace LD29
         public Action Update { get { return update == null ? emptyFunction : update; } }
         private Action update;
 
+        public Action RayCastHit { get { return rayCastHit == null ? delegate { } : rayCastHit; } }
+        private Action rayCastHit;
+
         public bool Grabbable { get { return grabbable.HasValue ? grabbable.Value : true; } }
         private bool? grabbable;
 
         // an object containing state for the update function (locals, etc) that you can use and cast as necessary
         public object UpdateStateObject;
 
-        public GameProperties(Action update, bool? grabbable, params InitialCollisionDetectedEventHandler<EntityCollidable>[] collisionHandlers)
+        public GameProperties(Action update, Action rayCast, bool? grabbable, params InitialCollisionDetectedEventHandler<EntityCollidable>[] collisionHandlers)
         {
             this.update = update;
             this.collisionHandlers = collisionHandlers;
             this.UpdateStateObject = null;
             this.grabbable = grabbable;
+            this.rayCastHit = rayCast;
         }
 
-        public GameProperties WireframeProperties { get { return new GameProperties(null, null); } }
+        public GameProperties WireframeProperties { get { return new GameProperties(null, null, null); } }
     }
 }

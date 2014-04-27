@@ -175,7 +175,7 @@ namespace LD29
             if(Loading)
             {
                 RenderingDevice.SpriteBatch.Begin();
-                RenderingDevice.SpriteBatch.Draw(loadingSplash, new Vector2(RenderingDevice.Width * 0.5f, RenderingDevice.Height * 0.5f), Color.White);
+                RenderingDevice.SpriteBatch.Draw(loadingSplash, new Vector2(RenderingDevice.Width * 0.5f, RenderingDevice.Height * 0.5f), null, Color.White, 0, new Vector2(loadingSplash.Width, loadingSplash.Height) * 0.5f, 1, SpriteEffects.None, 0);
                 RenderingDevice.SpriteBatch.End();
                 loadingScreen.Draw();
             }
@@ -243,7 +243,7 @@ namespace LD29
             GameModel tree = new GameModel(new Vector3(5, 5, 1.2f), Loader.Tree,
                 new GameTexture("Tree", Loader.TreeTexture,
                     new PhysicsProperties(null, 0.9f, 0.8f, null, true, null),
-                    new GameProperties(null, false),
+                    new GameProperties(null, null, false),
                     new GraphicsProperties(null, true)));
             GameModel ball = new GameModel(new BEPUphysics.Entities.Prefabs.Sphere(new Vector3(3, -2, 3), 1), Vector3.Zero, Loader.Ball,
                 new GameTexture("Beach ball", Loader.BallTexture,
@@ -254,7 +254,7 @@ namespace LD29
             GameModel anvil = new GameModel(new Vector3(-2, -6, 0.7f), Loader.Anvil,
                 new GameTexture("Anvil", Loader.AnvilTexture,
                     new PhysicsProperties(null, null, null, 15000, true, true),
-                    new GameProperties(null, false)));
+                    new GameProperties(null, null, false)));
 
             Renderer.Add(tree);
             Renderer.Add(ball);

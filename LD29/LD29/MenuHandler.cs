@@ -518,7 +518,7 @@ namespace LD29
                 selectedControl = resume;
                 selectedControl.IsSelected = null;
 
-                menu = new ConfirmationMenu("Are you sure you want to return to the main menu?\n                                  All progress will be lost.",
+                menu = new ConfirmationMenu("Are you sure you want to return to the main menu?\n                       All progress will be lost.",
                     delegate { Program.Game.BGM.Volume = 0.5f; GameManager.State = GameState.MainMenu; Program.Game.End(); });
             }
 
@@ -532,13 +532,13 @@ namespace LD29
                 RenderingDevice.SpriteBatch.Draw(loader.mainMenuLogo, new Vector2(RenderingDevice.Width * 0.97f - loader.mainMenuLogo.Width / 2, RenderingDevice.Height * 0.03f - loader.mainMenuLogo.Height / 2), null, Color.White, 0.0f, new Vector2(loader.mainMenuLogo.Width / 2, loader.mainMenuLogo.Height / 2), 0.3f * RenderingDevice.TextureScaleFactor, SpriteEffects.None, 0);
                 RenderingDevice.SpriteBatch.DrawString(loader.BiggerFont, "Paused", new Vector2(RenderingDevice.Width * 0.5f, RenderingDevice.Height * 0.3f), Color.OrangeRed, 0, loader.BiggerFont.MeasureString("Paused") * 0.5f, RenderingDevice.TextureScaleFactor, SpriteEffects.None, 0);
 
-                Vector2 stringLength = loader.BiggerFont.MeasureString("Press          to resume");
+                Vector2 stringLength = loader.BiggerFont.MeasureString("Press        to resume");
                 Vector2 screenSpot = new Vector2(RenderingDevice.Width * 0.5f, RenderingDevice.Height * 0.5f);
-                RenderingDevice.SpriteBatch.DrawString(loader.BiggerFont, "Press          to resume", screenSpot, Color.White, 0, stringLength * 0.5f, RenderingDevice.TextureScaleFactor, SpriteEffects.None, 0);
+                RenderingDevice.SpriteBatch.DrawString(loader.BiggerFont, "Press        to resume", screenSpot, Color.White, 0, stringLength * 0.5f, RenderingDevice.TextureScaleFactor, SpriteEffects.None, 0);
                 if(Input.ControlScheme == ControlScheme.Keyboard)
-                    SymbolWriter.WriteKeyboardIcon(Keys.Escape, screenSpot, new Vector2((stringLength.X * 0.5f + SymbolWriter.IconCenter.X * 0.5f * 0.444f - loader.BiggerFont.MeasureString("Pr").X), SymbolWriter.IconCenter.Y + 10), true);
+                    SymbolWriter.WriteKeyboardIcon(Keys.Escape, screenSpot, new Vector2((stringLength.X * 0.5f + SymbolWriter.IconCenter.X * 0.5f * 0.81f - loader.BiggerFont.MeasureString("Press ").X), SymbolWriter.IconCenter.Y + 10), false);
                 else
-                    SymbolWriter.WriteXboxIcon(Buttons.Start, screenSpot, new Vector2((stringLength.X * 0.5f + SymbolWriter.IconCenter.X * 0.5f * 0.444f - loader.BiggerFont.MeasureString("Pr").X), SymbolWriter.IconCenter.Y + 10), true);
+                    SymbolWriter.WriteXboxIcon(Buttons.Start, screenSpot, new Vector2((stringLength.X * 0.5f + SymbolWriter.IconCenter.X * 0.5f * 0.81f - loader.BiggerFont.MeasureString("Press ").X), SymbolWriter.IconCenter.Y + 10), false);
 
                 base.Draw(gameTime);
 
@@ -674,7 +674,7 @@ namespace LD29
                 Input.NullMessagePad();
                 startBeenPressed = false;
                 ResetTimer();
-                //MediaSystem.PlaySoundEffect(SFXOptions.Box_Death);
+                MediaSystem.PlaySoundEffect(SFXOptions.Box_Death);
             }
 
             internal void ResetTimer()

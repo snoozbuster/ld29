@@ -63,10 +63,13 @@ namespace LD29
             if(targetedTexture != null)
             {
                 Vector2 length = font.MeasureString(targetedTexture.FriendlyName);
-                RenderingDevice.SpriteBatch.DrawString(font, targetedTexture.FriendlyName, dockTex.UpperLeft - new Vector2(75 + length.X / 2, -2), Color.Black, 0, new Vector2(length.X / 2, 0), 1, SpriteEffects.None, 0);
+                RenderingDevice.SpriteBatch.DrawString(font, targetedTexture.FriendlyName, dockTex.UpperLeft - new Vector2(110, 5), Color.Black, 0, new Vector2(length.X / 2, 0), 1, SpriteEffects.None, 0);
             }
             if(heldTextures[textureIndex] != null)
-                RenderingDevice.SpriteBatch.DrawString(font, heldTextures[textureIndex].FriendlyName, new Vector2(dockTex.LowerRight.X, dockTex.UpperLeft.Y) + new Vector2(50, 0), Color.Black);
+            {
+                Vector2 length = font.MeasureString(heldTextures[textureIndex].FriendlyName);
+                RenderingDevice.SpriteBatch.DrawString(font, heldTextures[textureIndex].FriendlyName, new Vector2(dockTex.LowerRight.X, dockTex.UpperLeft.Y) + new Vector2(100, -10), Color.Black, 0, new Vector2(length.X / 2, 0), 1, SpriteEffects.None, 0);
+            }
 
             for(int i = 0; i < heldTextures.Length; i++)
                 if(heldTextures[i] != null && i != textureIndex)
