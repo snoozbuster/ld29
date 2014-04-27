@@ -49,7 +49,7 @@ namespace LD29
                 int[] indices;
                 ModelDataExtractor.GetVerticesAndIndicesFromModel(Model, out verts, out indices);
 
-                Entity = new MobileMesh(verts, indices, BEPUutilities.AffineTransform.Identity, MobileMeshSolidity.DoubleSided, Texture.PhysicsProperties.Mass);
+                Entity = new MobileMesh(verts, indices, BEPUutilities.AffineTransform.Identity, MobileMeshSolidity.Solid, Texture.PhysicsProperties.Mass);
             }
             else
                 Entity = e;

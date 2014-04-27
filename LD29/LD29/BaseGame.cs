@@ -245,12 +245,13 @@ namespace LD29
                     new PhysicsProperties(null, 0.9f, 0.8f, null, true, null),
                     new GameProperties(null, null, false),
                     new GraphicsProperties(null, true)));
+            tree.Entity.CollisionInformation.Shape.Volume = 0.5f;
             GameModel ball = new GameModel(new BEPUphysics.Entities.Prefabs.Sphere(new Vector3(3, -2, 3), 1), Vector3.Zero, Loader.Ball,
                 new GameTexture("Beach ball", Loader.BallTexture,
                     new PhysicsProperties(2.5f, 0.3f, 0.2f, 5f, true, true)));
             GameModel orange = new GameModel(new BEPUphysics.Entities.Prefabs.Sphere(new Vector3(-7, 4, 1), 1), Vector3.Zero, Loader.Orange,
                 new GameTexture("Orange", Loader.OrangeTexture,
-                    new PhysicsProperties(0.1f, null, null, 7f, true, true)));
+                    new PhysicsProperties(0.1f, null, null, 5f, true, true)));
             GameModel anvil = new GameModel(new Vector3(-2, -6, 0.7f), Loader.Anvil,
                 new GameTexture("Anvil", Loader.AnvilTexture,
                     new PhysicsProperties(null, null, null, 15000, true, true),
