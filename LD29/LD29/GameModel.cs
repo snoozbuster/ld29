@@ -70,6 +70,7 @@ namespace LD29
                 throw new InvalidOperationException("Can't rip an unrippable texture!");
 
             GameTexture output = Texture;
+            output.CurrentModel = null;
             Texture = new GameTexture("Wireframe", Texture.ActualTexture) { Wireframe = true };
             Entity.AngularVelocity = Entity.LinearVelocity = Vector3.Zero;
             return output;

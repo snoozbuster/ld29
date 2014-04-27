@@ -16,6 +16,8 @@ namespace LD29
         public PhysicsProperties PhysicsProperties { get; private set; }
         public string FriendlyName { get; private set; }
 
+        public GameModel CurrentModel;
+
         public GameTexture(string name, Texture2D texture, PhysicsProperties pp = new PhysicsProperties(), GameProperties gp = new GameProperties(), GraphicsProperties ggp = new GraphicsProperties())
         {
             FriendlyName = name;
@@ -43,6 +45,8 @@ namespace LD29
                 m.Entity.CollisionInformation.Events.InitialCollisionDetected += d;
             if(m.Space != null)
                 m.Space.DuringForcesUpdateables.Starting += GameProperties.Update;
+
+            CurrentModel = m;
         }
     }
 }

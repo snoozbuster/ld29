@@ -51,6 +51,7 @@ namespace LD29
         public Model Tree;
         public Model Anvil;
         public Model Water;
+        public Model Burst;
         #endregion
 
         #region model textures
@@ -67,7 +68,7 @@ namespace LD29
 
         public IEnumerator<float> GetEnumerator()
         {
-            totalItems = 9 + 2 + 6 + 5;
+            totalItems = 9 + 2 + 7 + 5;
 
             #region Font
             Font = content.Load<SpriteFont>("font/font");
@@ -123,6 +124,8 @@ namespace LD29
             Anvil = content.Load<Model>("models/anvil");
             yield return progress();
             Water = content.Load<Model>("models/water");
+            yield return progress();
+            Burst = content.Load<Model>("models/burst");
             yield return progress();
             #endregion
 
