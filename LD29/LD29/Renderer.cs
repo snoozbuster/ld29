@@ -62,7 +62,7 @@ namespace LD29
             models.Add(model, true);
         }
 
-        public static void Add(Model model)
+        public static void Add(Model model, bool transparent = false)
         {
             List<Texture2D> list = new List<Texture2D>();
             foreach(ModelMesh mesh in model.Meshes)
@@ -79,7 +79,7 @@ namespace LD29
                         foreach(ModelMeshPart meshPart in mesh.MeshParts)
                             meshPart.Effect = shader.Clone();
                 }
-            multiMeshModel.Add(new ModelData(model, list));
+            multiMeshModel.Add(new ModelData(model, list, transparent));
         }
 
         public static void Remove(GameModel model)
@@ -114,7 +114,9 @@ namespace LD29
                     else
                         transparentMeshes.Add(m.Key);
                 }
-            drawMultiMeshes(clipPlane, view);
+            foreach(ModelData m in multiMeshModel)
+                if(!m.Transparent)
+                    drawMultiMesh(m, clipPlane, view);
 
             setForWireframe();
             foreach(KeyValuePair<GameModel, bool> m in models)
@@ -133,6 +135,9 @@ namespace LD29
             transparentMeshes.Reverse();
             foreach(GameModel m in transparentMeshes)
                 drawMesh(m.Model.Meshes[0], m, "ShadowedScene", clipPlane, view);
+            foreach(ModelData m in multiMeshModel)
+                if(m.Transparent)
+                    drawMultiMesh(m, clipPlane, view);
         }
 
         private static int sortGlassList(GameModel x, GameModel y)
@@ -145,33 +150,30 @@ namespace LD29
             return pos1Distance.CompareTo(pos2Distance);
         }
 
-        private static void drawMultiMeshes(Plane? clipPlane, Matrix view)
+        private static void drawMultiMesh(ModelData m, Plane? clipPlane, Matrix view)
         {
-            foreach(ModelData m in multiMeshModel)
+            int i = 0;
+            foreach(ModelMesh mesh in m.Model.Meshes)
             {
-                int i = 0;
-                foreach(ModelMesh mesh in m.Model.Meshes)
+                foreach(Effect currentEffect in mesh.Effects)
                 {
-                    foreach(Effect currentEffect in mesh.Effects)
+                    currentEffect.CurrentTechnique = currentEffect.Techniques["ShadowedScene"];
+
+                    currentEffect.Parameters["Texture"].SetValue(m.Textures[i++]);
+
+                    currentEffect.Parameters["xCamerasViewProjection"].SetValue(view * MathConverter.Convert(Camera.ProjectionMatrix));
+                    currentEffect.Parameters["xWorld"].SetValue(mesh.ParentBone.Transform);// * Camera.World);
+                    currentEffect.Parameters["xPassThroughLighting"].SetValue(true);
+
+                    if(clipPlane.HasValue)
                     {
-                        currentEffect.CurrentTechnique = currentEffect.Techniques["ShadowedScene"];
-
-                        currentEffect.Parameters["Texture"].SetValue(m.Textures[i++]);
-
-                        currentEffect.Parameters["xCamerasViewProjection"].SetValue(view * MathConverter.Convert(Camera.ProjectionMatrix));
-                        currentEffect.Parameters["xWorld"].SetValue(mesh.ParentBone.Transform);// * Camera.World);
-                        currentEffect.Parameters["xPassThroughLighting"].SetValue(true);
-
-                        if(clipPlane.HasValue)
-                        {
-                            currentEffect.Parameters["xEnableClipping"].SetValue(true);
-                            currentEffect.Parameters["xClipPlane"].SetValue(new Vector4(clipPlane.Value.Normal, clipPlane.Value.D));
-                        }
-                        else
-                            currentEffect.Parameters["xEnableClipping"].SetValue(false);
+                        currentEffect.Parameters["xEnableClipping"].SetValue(true);
+                        currentEffect.Parameters["xClipPlane"].SetValue(new Vector4(clipPlane.Value.Normal, clipPlane.Value.D));
                     }
-                    mesh.Draw();
+                    else
+                        currentEffect.Parameters["xEnableClipping"].SetValue(false);
                 }
+                mesh.Draw();
             }
         }
 
@@ -231,11 +233,13 @@ namespace LD29
             public Model Model;
             public List<Texture2D> Textures;
             public bool Active;
+            public bool Transparent;
 
-            public ModelData(Model m, List<Texture2D> t)
+            public ModelData(Model m, List<Texture2D> t, bool transparent)
             {
                 Active = true;
                 Model = m;
+                Transparent = transparent;
                 Textures = t;
             }
         }

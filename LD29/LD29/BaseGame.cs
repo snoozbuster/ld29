@@ -11,6 +11,8 @@ using BEPUphysics.CollisionShapes;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysicsDemos.AlternateMovement.Character;
 using BEPUphysics.Entities;
+using BEPUphysics.UpdateableSystems;
+using System.Collections.Generic;
 
 namespace LD29
 {
@@ -31,6 +33,8 @@ namespace LD29
 
         public SoundEffectInstance BGM;
         Player character;
+
+        List<FluidVolume> waters = new List<FluidVolume>();
 
         public BaseGame()
         {
@@ -141,7 +145,7 @@ namespace LD29
                     {
                         GameManager.Space.Update((float)(gameTime.ElapsedGameTime.TotalSeconds));
 
-                        character.Update(gameTime);
+                        character.Update(gameTime, waters);
 
                         if(IsActive)
                             Mouse.SetPosition(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
@@ -209,6 +213,29 @@ namespace LD29
             e.CollisionInformation.CollisionRules.Group = GameModel.NormalGroup;
 
             GameManager.Space.Add(e);
+            
+            var tris = new List<BEPUutilities.Vector3[]>();
+            float basinWidth = 12;
+            float basinLength = 12;
+            float waterHeight = 2.5f;
+            BEPUutilities.Vector3 offset = new BEPUutilities.Vector3(19.05975f, -18.05393f, 0);
+
+            //Remember, the triangles composing the surface need to be coplanar with the surface.  In this case, this means they have the same height.
+            tris.Add(new[]
+                         {
+                             new BEPUutilities.Vector3(-basinWidth / 2, -basinLength / 2, waterHeight) + offset, new BEPUutilities.Vector3(basinWidth / 2, -basinLength / 2, waterHeight) + offset,
+                             new BEPUutilities.Vector3(-basinWidth / 2, basinLength / 2, waterHeight) + offset
+                         });
+            tris.Add(new[]
+                         {
+                             new BEPUutilities.Vector3(-basinWidth / 2, basinLength / 2, waterHeight) + offset, new BEPUutilities.Vector3(basinWidth / 2, -basinLength / 2, waterHeight) + offset,
+                             new BEPUutilities.Vector3(basinWidth / 2, basinLength / 2, waterHeight) + offset
+                         });
+            FluidVolume water = new FluidVolume(Vector3.UnitZ, -9.81f, tris, waterHeight, 5f, 0.8f, 0.7f);
+            water.CollisionRules.Group = GameModel.NormalGroup;
+            Renderer.Add(Loader.Water, true);
+            waters.Add(water);
+            GameManager.Space.Add(water);
         }
 
         private void addModels()
@@ -250,6 +277,7 @@ namespace LD29
             character.Deactivate();
             GameManager.Space.Clear();
             Renderer.Clear();
+            waters.Clear();
         }
 
         #region windows

@@ -30,6 +30,7 @@ namespace LD29
         public Texture2D Instructions_PC;
 
         public Texture2D Dock;
+        public Texture2D TabletopDotPNG;
         #endregion
 
         #region Buttons
@@ -49,6 +50,7 @@ namespace LD29
         public Model Room;
         public Model Tree;
         public Model Anvil;
+        public Model Water;
         #endregion
 
         #region model textures
@@ -65,7 +67,7 @@ namespace LD29
 
         public IEnumerator<float> GetEnumerator()
         {
-            totalItems = 9 + 2 + 5 + 4;
+            totalItems = 9 + 2 + 6 + 5;
 
             #region Font
             Font = content.Load<SpriteFont>("font/font");
@@ -120,6 +122,8 @@ namespace LD29
             yield return progress();
             Anvil = content.Load<Model>("models/anvil");
             yield return progress();
+            Water = content.Load<Model>("models/water");
+            yield return progress();
             #endregion
 
             #region model textures
@@ -130,6 +134,8 @@ namespace LD29
             BallTexture = content.Load<Texture2D>("textures/ball_tex");
             yield return progress();
             AnvilTexture = content.Load<Texture2D>("textures/anvil_tex");
+            yield return progress();
+            TabletopDotPNG = content.Load<Texture2D>("textures/underwater");
             yield return progress();
             #endregion
         }

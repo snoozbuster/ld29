@@ -3,6 +3,7 @@ using BEPUphysics;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.CollisionRuleManagement;
+using BEPUphysics.UpdateableSystems;
 using BEPUphysicsDemos.AlternateMovement.Character;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -24,15 +25,20 @@ namespace LD29
         private bool canTakeTextures { get { if(character.IsGrabbing) return false; for(int i = 0; i < heldTextures.Length; i++) if(heldTextures[i] == null) return true; return false; } }
 
         private Sprite dockTex;
+        private Texture2D underwaterTex;
         private SpriteFont font;
 
         private Rectangle[] drawingRectangles = new Rectangle[5];
+        private Rectangle screenRect; 
+
+        private bool underwater;
 
         public Player(BaseGame g)
         {
             character = new CharacterControllerInput(GameManager.Space, Renderer.Camera, g);
             dockTex = new Sprite(delegate { return g.Loader.Dock; }, new Vector2(RenderingDevice.Width / 2, RenderingDevice.Height * 0.95f), null, Sprite.RenderPoint.Center);
             font = g.Loader.Font;
+            underwaterTex = g.Loader.TabletopDotPNG;
 
             int add = 0;
             for(int i = 0; i < drawingRectangles.Length; i++)
@@ -42,11 +48,16 @@ namespace LD29
                 add += 150;
                 add += 10;
             }
+
+            screenRect = new Rectangle(0, 0, (int)RenderingDevice.Width, (int)RenderingDevice.Height);
         }
 
         public void Draw()
         {
             RenderingDevice.SpriteBatch.Begin();
+
+            if(underwater)
+                RenderingDevice.SpriteBatch.Draw(underwaterTex, screenRect, Color.White);
 
             dockTex.Draw();
             if(targetedTexture != null)
@@ -71,9 +82,19 @@ namespace LD29
             RenderingDevice.SpriteBatch.End();
         }
 
-        public void Update(GameTime gameTime)
+        public void Update(GameTime gameTime, List<FluidVolume> water)
         {
             character.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+
+            underwater = false;
+            foreach(FluidVolume f in water)
+                if(f.BoundingBox.Max.X > Renderer.Camera.Position.X && f.BoundingBox.Min.X < Renderer.Camera.Position.X &&
+                    f.BoundingBox.Max.Y > Renderer.Camera.Position.Y && f.BoundingBox.Min.Y < Renderer.Camera.Position.Y &&
+                    f.BoundingBox.Max.Z > Renderer.Camera.Position.Z && f.BoundingBox.Min.Z < Renderer.Camera.Position.Z)
+                {
+                    underwater = true;
+                    break;
+                }
 
             targetedTexture = null;
             GameModel targetedModel = null;
@@ -149,6 +170,7 @@ namespace LD29
 
         public void Activate()
         {
+            Renderer.Camera.Position = new BEPUutilities.Vector3(0, 0, 5);
             character.Activate();
         }
 
