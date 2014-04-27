@@ -131,8 +131,19 @@ namespace LD29
                 }
             }
 
-            int mouseScroll = Input.MouseState.ScrollWheelValue - Input.MouseLastFrame.ScrollWheelValue;
-            int indexDirection = -Math.Sign(mouseScroll);
+            int indexDirection = 0;
+            if(Input.ControlScheme == ControlScheme.Keyboard)
+            {
+                int mouseScroll = Input.MouseState.ScrollWheelValue - Input.MouseLastFrame.ScrollWheelValue;
+                indexDirection = -Math.Sign(mouseScroll);
+            }
+            else
+            {
+                if(Input.CheckXboxJustPressed(Microsoft.Xna.Framework.Input.Buttons.LeftShoulder))
+                    indexDirection = -1;
+                else if(Input.CheckXboxJustPressed(Microsoft.Xna.Framework.Input.Buttons.RightShoulder))
+                    indexDirection = 1;
+            }
             if(indexDirection != 0)
             {
                 int originalIndex = textureIndex;
@@ -145,7 +156,9 @@ namespace LD29
                 } while(heldTextures[textureIndex] == null && originalIndex != textureIndex);
             }
 
-            if(targetedModel != null && canTakeTextures && targetedTexture != null && Input.CheckForMouseJustReleased(1))
+            if(targetedModel != null && canTakeTextures && targetedTexture != null && 
+                ((Input.ControlScheme == ControlScheme.Keyboard && Input.CheckForMouseJustReleased(1)) ||
+                (Input.ControlScheme == ControlScheme.XboxController && Input.CheckXboxJustPressed(Microsoft.Xna.Framework.Input.Buttons.LeftTrigger))))
             {
                 GameTexture t = targetedModel.RipTexture();
                 GameTexture burstTex = new GameTexture("Burst", t.ActualTexture,
@@ -159,7 +172,9 @@ namespace LD29
                 Renderer.Add(missile.Model);
                 GameManager.Space.Add(missile);
             }
-            else if(heldTextures[textureIndex] != null && targetedModel != null && targetedTexture == null && Input.CheckForMouseJustReleased(2)) // looking at wireframe
+            else if(heldTextures[textureIndex] != null && targetedModel != null && targetedTexture == null &&
+                ((Input.ControlScheme == ControlScheme.Keyboard && Input.CheckForMouseJustReleased(2)) ||
+                (Input.ControlScheme == ControlScheme.XboxController && Input.CheckXboxJustPressed(Microsoft.Xna.Framework.Input.Buttons.RightTrigger))))
             {
                 GameTexture t = heldTextures[textureIndex];
                 GameTexture burstTex = new GameTexture("Burst", t.ActualTexture,

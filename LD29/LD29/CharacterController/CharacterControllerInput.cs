@@ -112,65 +112,64 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
                 Vector2 totalMovement = Vector2.Zero;
 
-#if XBOX360
-                totalMovement += new Vector2(gamePadInput.ThumbSticks.Left.X, gamePadInput.ThumbSticks.Left.Y);
 
-                CharacterController.HorizontalMotionConstraint.SpeedScale = Math.Min(totalMovement.Length(), 1); //Don't trust the game pad to output perfectly normalized values.
-                CharacterController.HorizontalMotionConstraint.MovementDirection = totalMovement;
-                
-                CharacterController.StanceManager.DesiredStance = gamePadInput.IsButtonDown(Buttons.RightStick) ? Stance.Crouching : Stance.Standing;
-
-                //Jumping
-                if (previousGamePadInput.IsButtonUp(Buttons.LeftStick) && gamePadInput.IsButtonDown(Buttons.LeftStick))
+                if(Input.ControlScheme == ControlScheme.XboxController)
                 {
-                    CharacterController.Jump();
-                }
-#else
+                    totalMovement += new Vector2(Input.CurrentPad.ThumbSticks.Left.X, Input.CurrentPad.ThumbSticks.Left.Y);
 
-                //Collect the movement impulses.
+                    CharacterController.HorizontalMotionConstraint.SpeedScale = Math.Min(totalMovement.Length(), 1); //Don't trust the game pad to output perfectly normalized values.
+                    CharacterController.HorizontalMotionConstraint.MovementDirection = totalMovement;
 
-                if (Input.KeyboardState.IsKeyDown(Keys.W))
-                {
-                    totalMovement += new Vector2(0, 1);
+                    CharacterController.StanceManager.DesiredStance = Input.CurrentPad.IsButtonDown(Buttons.B) ? Stance.Crouching : Stance.Standing;
+
+                    //Jumping
+                    if(Input.CurrentPadLastFrame.IsButtonUp(Buttons.A) && Input.CurrentPad.IsButtonDown(Buttons.A))
+                    {
+                        CharacterController.Jump();
+                    }
                 }
-                if(Input.KeyboardState.IsKeyDown(Keys.S))
+                else if(Input.ControlScheme == ControlScheme.Keyboard)
                 {
-                    totalMovement += new Vector2(0, -1);
-                }
-                if(Input.KeyboardState.IsKeyDown(Keys.A))
-                {
-                    totalMovement += new Vector2(-1, 0);
-                }
-                if(Input.KeyboardState.IsKeyDown(Keys.D))
-                {
-                    totalMovement += new Vector2(1, 0);
-                }
-                if (totalMovement == Vector2.Zero)
-                    CharacterController.HorizontalMotionConstraint.MovementDirection = Vector2.Zero;
-                else
-                    CharacterController.HorizontalMotionConstraint.MovementDirection = Vector2.Normalize(totalMovement);
+                    //Collect the movement impulses.
+
+                    if(Input.KeyboardState.IsKeyDown(Keys.W))
+                    {
+                        totalMovement += new Vector2(0, 1);
+                    }
+                    if(Input.KeyboardState.IsKeyDown(Keys.S))
+                    {
+                        totalMovement += new Vector2(0, -1);
+                    }
+                    if(Input.KeyboardState.IsKeyDown(Keys.A))
+                    {
+                        totalMovement += new Vector2(-1, 0);
+                    }
+                    if(Input.KeyboardState.IsKeyDown(Keys.D))
+                    {
+                        totalMovement += new Vector2(1, 0);
+                    }
+                    if(totalMovement == Vector2.Zero)
+                        CharacterController.HorizontalMotionConstraint.MovementDirection = Vector2.Zero;
+                    else
+                        CharacterController.HorizontalMotionConstraint.MovementDirection = Vector2.Normalize(totalMovement);
 
 
-                CharacterController.StanceManager.DesiredStance = Input.KeyboardState.IsKeyDown(Keys.LeftShift) ? Stance.Crouching : Stance.Standing;
+                    CharacterController.StanceManager.DesiredStance = Input.KeyboardState.IsKeyDown(Keys.LeftShift) ? Stance.Crouching : Stance.Standing;
 
-                //Jumping
-                if(Input.KeyboardLastFrame.IsKeyUp(Keys.Space) && Input.KeyboardState.IsKeyDown(Keys.Space))
-                {
-                    CharacterController.Jump();
+                    //Jumping
+                    if(Input.KeyboardLastFrame.IsKeyUp(Keys.Space) && Input.KeyboardState.IsKeyDown(Keys.Space))
+                    {
+                        CharacterController.Jump();
+                    }
                 }
-#endif
                 CharacterController.ViewDirection = Camera.WorldMatrix.Forward;
-
 
                 #region Grabber Input
 
                 //Update grabber
 
-#if !WINDOWS
-            if (Game.GamePadInput.IsButtonDown(Buttons.RightShoulder) && !grabber.IsUpdating)
-#else
-                if(Input.CheckKeyboardPress(Keys.E) && !grabber.IsGrabbing)
-#endif
+            if (((Input.ControlScheme == ControlScheme.XboxController && Input.CurrentPad.IsButtonDown(Buttons.X)) ||
+                 (Input.ControlScheme == ControlScheme.Keyboard && Input.CheckKeyboardPress(Keys.E))) && !grabber.IsUpdating)
                 {
                     //Find the earliest ray hit
                     RayCastResult raycastResult;
@@ -194,13 +193,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                     }
 
                 }
-#if !WINDOWS
-            if (Game.GamePadInput.IsButtonDown(Buttons.RightShoulder) && grabber.IsUpdating)
-#else
                 else if(grabber.IsUpdating)
-#endif
                 {
-                    if(Input.CheckKeyboardPress(Keys.E))
+                    if((Input.ControlScheme == ControlScheme.XboxController && Input.CurrentPad.IsButtonDown(Buttons.X)) ||
+                        (Input.ControlScheme == ControlScheme.Keyboard && Input.CheckKeyboardPress(Keys.E)))
                         grabber.Release();
                     grabber.GoalPosition = Renderer.Camera.Position + Renderer.Camera.WorldMatrix.Forward * grabDistance;
                 }
