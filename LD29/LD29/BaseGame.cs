@@ -13,6 +13,10 @@ using BEPUphysicsDemos.AlternateMovement.Character;
 using BEPUphysics.Entities;
 using BEPUphysics.UpdateableSystems;
 using System.Collections.Generic;
+using BEPUphysics.BroadPhaseEntries.MobileCollidables;
+using BEPUphysics.Constraints.SingleEntity;
+using BEPUphysics.Constraints.TwoEntity.Joints;
+using BEPUphysics.Constraints.SolverGroups;
 
 namespace LD29
 {
@@ -75,6 +79,7 @@ namespace LD29
         {
             RenderingDevice.Initialize(Graphics, Program.Cutter, GameManager.Space, Content.Load<Effect>("shaders/shadowmap"));
             Renderer.Initialize(Graphics, this, GameManager.Space, Content.Load<Effect>("shaders/shadowmap"));
+            Program.Initialize(GraphicsDevice);
             MyExtensions.Initialize(GraphicsDevice);
             loadingScreen = new LoadingScreen(Content, GraphicsDevice);
             loadingSplash = Content.Load<Texture2D>("gui/loading");
@@ -203,68 +208,176 @@ namespace LD29
 
         private void buildRoom()
         {
-            Renderer.Add(Loader.Room);
-
-            BEPUutilities.Vector3[] verts;
-            int[] indices;
-            ModelDataExtractor.GetVerticesAndIndicesFromModel(Loader.Room, out verts, out indices);
-
-            Entity e = new MobileMesh(verts, indices, BEPUutilities.AffineTransform.Identity, MobileMeshSolidity.DoubleSided);
-            e.CollisionInformation.CollisionRules.Group = GameModel.NormalGroup;
-
-            GameManager.Space.Add(e);
             
-            var tris = new List<BEPUutilities.Vector3[]>();
-            float basinWidth = 12;
-            float basinLength = 12;
-            float waterHeight = 2.5f;
-            BEPUutilities.Vector3 offset = new BEPUutilities.Vector3(19.05975f, -18.05393f, 0);
+            //var tris = new List<BEPUutilities.Vector3[]>();
+            //float basinWidth = 12;
+            //float basinLength = 12;
+            //float waterHeight = 2.5f;
+            //BEPUutilities.Vector3 offset = new BEPUutilities.Vector3(19.05975f, -18.05393f, 0);
 
-            //Remember, the triangles composing the surface need to be coplanar with the surface.  In this case, this means they have the same height.
-            tris.Add(new[]
-                         {
-                             new BEPUutilities.Vector3(-basinWidth / 2, -basinLength / 2, waterHeight) + offset, new BEPUutilities.Vector3(basinWidth / 2, -basinLength / 2, waterHeight) + offset,
-                             new BEPUutilities.Vector3(-basinWidth / 2, basinLength / 2, waterHeight) + offset
-                         });
-            tris.Add(new[]
-                         {
-                             new BEPUutilities.Vector3(-basinWidth / 2, basinLength / 2, waterHeight) + offset, new BEPUutilities.Vector3(basinWidth / 2, -basinLength / 2, waterHeight) + offset,
-                             new BEPUutilities.Vector3(basinWidth / 2, basinLength / 2, waterHeight) + offset
-                         });
-            FluidVolume water = new FluidVolume(Vector3.UnitZ, -9.81f, tris, waterHeight, 5f, 0.8f, 0.7f);
-            water.CollisionRules.Group = GameModel.NormalGroup;
-            Renderer.Add(Loader.Water, true);
-            waters.Add(water);
-            GameManager.Space.Add(water);
+            ////Remember, the triangles composing the surface need to be coplanar with the surface.  In this case, this means they have the same height.
+            //tris.Add(new[]
+            //             {
+            //                 new BEPUutilities.Vector3(-basinWidth / 2, -basinLength / 2, waterHeight) + offset, new BEPUutilities.Vector3(basinWidth / 2, -basinLength / 2, waterHeight) + offset,
+            //                 new BEPUutilities.Vector3(-basinWidth / 2, basinLength / 2, waterHeight) + offset
+            //             });
+            //tris.Add(new[]
+            //             {
+            //                 new BEPUutilities.Vector3(-basinWidth / 2, basinLength / 2, waterHeight) + offset, new BEPUutilities.Vector3(basinWidth / 2, -basinLength / 2, waterHeight) + offset,
+            //                 new BEPUutilities.Vector3(basinWidth / 2, basinLength / 2, waterHeight) + offset
+            //             });
+            //FluidVolume water = new FluidVolume(Vector3.UnitZ, -9.81f, tris, waterHeight, 5f, 0.8f, 0.7f);
+            //water.CollisionRules.Group = GameModel.NormalGroup;
+            //Renderer.Add(Loader.Water, true);
+            //waters.Add(water);
+            //GameManager.Space.Add(water);
         }
 
         private void addModels()
         {
-            GameModel tree = new GameModel(new Vector3(5, 5, 1.2f), Loader.Tree,
+            Renderer.Add(Loader.Level1);
+
+            BEPUutilities.Vector3[] verts;
+            int[] indices;
+            ModelDataExtractor.GetVerticesAndIndicesFromModel(Loader.Level1, out verts, out indices);
+
+            Entity e = new MobileMesh(verts, indices, BEPUutilities.AffineTransform.Identity, MobileMeshSolidity.DoubleSided);
+            e.CollisionInformation.CollisionRules.Group = GameModel.TerrainGroup;
+
+            GameManager.Space.Add(e);
+
+            GameModel tree = new GameModel(new Vector3(-5, 36, 7.1269f), Loader.Tree,
                 new GameTexture("Tree", Loader.TreeTexture,
                     new PhysicsProperties(null, 0.9f, 0.8f, null, true, null),
-                    new GameProperties(null, null, false),
+                    new GameProperties(null, null, false, null, null),
                     new GraphicsProperties(null, true)));
             tree.Entity.CollisionInformation.Shape.Volume = 0.5f;
-            GameModel ball = new GameModel(new BEPUphysics.Entities.Prefabs.Sphere(new Vector3(3, -2, 3), 1), Vector3.Zero, Loader.Ball,
-                new GameTexture("Beach ball", Loader.BallTexture,
-                    new PhysicsProperties(2.5f, 0.3f, 0.2f, 5f, true, true)));
-            GameModel orange = new GameModel(new BEPUphysics.Entities.Prefabs.Sphere(new Vector3(-7, 4, 1), 1), Vector3.Zero, Loader.Orange,
+            GameModel tree2 = new GameModel(new Vector3(5, 36, 7.1269f), Loader.Tree,
+                new GameTexture("Tree", Loader.TreeTexture,
+                    new PhysicsProperties(null, 0.9f, 0.8f, null, true, null),
+                    new GameProperties(null, null, false, null, null),
+                    new GraphicsProperties(null, true)));
+            tree2.Entity.CollisionInformation.Shape.Volume = 0.5f;
+            //GameModel ball = new GameModel(new BEPUphysics.Entities.Prefabs.Sphere(new Vector3(3, -2, 3), 1), Vector3.Zero, Loader.Ball,
+            //    new GameTexture("Beach ball", Loader.BallTexture,
+            //        new PhysicsProperties(2.5f, 0.3f, 0.2f, 5f, true, true)));
+            GameModel orange = new GameModel(new BEPUphysics.Entities.Prefabs.Sphere(new Vector3(-6, 31, 7), 0.2f), Vector3.Zero, Loader.Orange,
                 new GameTexture("Orange", Loader.OrangeTexture,
                     new PhysicsProperties(0.1f, null, null, 5f, true, true)));
-            GameModel anvil = new GameModel(new Vector3(-2, -6, 0.7f), Loader.Anvil,
-                new GameTexture("Anvil", Loader.AnvilTexture,
-                    new PhysicsProperties(null, null, null, 15000, true, true),
-                    new GameProperties(null, null, false)));
+            //GameModel anvil = new GameModel(new Vector3(-2, -6, 0.7f), Loader.Anvil,
+            //    new GameTexture("Anvil", Loader.AnvilTexture,
+            //        new PhysicsProperties(null, null, null, 15000, true, true),
+            //        new GameProperties(null, null, false)));
+            
+            GameModel button = new GameModel(new Vector3(0, 31, 3.175f), Loader.Button,
+                new GameTexture("Button", Loader.ButtonTexture,
+                    new PhysicsProperties(null, null, null, 900, false, true),
+                    new GameProperties(null, null, false,
+                        (sender, other, pair) => {
+                            EntityCollidable otherEntity = other as EntityCollidable;
+                            if(otherEntity == null || otherEntity.Entity == null)
+                                return;
+
+                            GameModel m = otherEntity.Entity.Tag as GameModel;
+                            if(m != null && m.Texture.FriendlyName == "Orange")
+                            {
+                                GameModel pThis = sender.Entity.Tag as GameModel;
+                                PrismaticJoint pMotor = pThis.Texture.GameProperties.UpdateStateObject as PrismaticJoint;
+                                pMotor.Motor.Settings.Servo.Goal = -0.07f;
+                            }
+                        },
+                        (sender, other, pair) =>
+                        {
+                            EntityCollidable otherEntity = other as EntityCollidable;
+                            if(otherEntity == null || otherEntity.Entity == null)
+                                return;
+
+                            GameModel m = otherEntity.Entity.Tag as GameModel;
+                            if(m != null && m.Texture.FriendlyName == "Orange")
+                            {
+                                GameModel pThis = sender.Entity.Tag as GameModel;
+                                PrismaticJoint pMotor = pThis.Texture.GameProperties.UpdateStateObject as PrismaticJoint;
+                                pMotor.Motor.Settings.Servo.Goal = 0;
+                            }
+                        }/*,
+                        rippedFrom => {
+                            SingleEntityLinearMotor pMotor = rippedFrom.Texture.GameProperties.UpdateStateObject as SingleEntityLinearMotor;
+                            pMotor.IsActive = false;
+                        },
+                        appliedTo => {
+                            SingleEntityLinearMotor pMotor = appliedTo.Texture.GameProperties.UpdateStateObject as SingleEntityLinearMotor;
+                            pMotor.Entity = appliedTo.Entity;
+                            pMotor.Point = appliedTo.Entity.Position;
+                            pMotor.Settings.Servo.Goal = appliedTo.Entity.Position;
+                            pMotor.IsActive = true;
+                        }*/)), false);
+            button.Entity.CollisionInformation.CollisionRules.Group = GameModel.FunctionalGroup;
+            PrismaticJoint lineJoint = new PrismaticJoint(e, button.Entity, button.Entity.Position, Vector3.UnitZ, button.Entity.Position);
+            lineJoint.IsActive = true;
+            lineJoint.Motor.Settings.Mode = BEPUphysics.Constraints.TwoEntity.Motors.MotorMode.Servomechanism;
+            lineJoint.Motor.IsActive = true;
+            lineJoint.Limit.Minimum = -0.07f;
+            lineJoint.Limit.Maximum = 0;
+            lineJoint.Limit.IsActive = true;
+            GameManager.Space.Add(lineJoint);
+            button.Texture.GameProperties.SetStateObject(lineJoint);
+
+            Action<GameProperties> doorUpdate = gameProps => {
+                if(lineJoint.IsActive && lineJoint.Motor.Settings.Servo.Goal != 0)
+                    (gameProps.UpdateStateObject as RevoluteJoint).Motor.Settings.Servo.Goal = 0;
+                else
+                    (gameProps.UpdateStateObject as RevoluteJoint).Motor.Settings.Servo.Goal = MathHelper.PiOver2;
+            };
+
+            GameModel leftDoor = new GameModel(new Vector3(-0.5f, 36.8f, 7), Loader.LeftDoor,
+                new GameTexture("Door", Loader.DoorTexture,
+                    new PhysicsProperties(null, null, null, 900, false, true),
+                    new GameProperties(doorUpdate, null, false, null, null)), false);
+            leftDoor.Entity.CollisionInformation.CollisionRules.Group = GameModel.FunctionalGroup;
+            //leftDoor.Entity.CollisionInformation.LocalPosition = new BEPUutilities.Vector3(0.5f, 0, 0);
+            RevoluteJoint angularJoint = new RevoluteJoint(e, leftDoor.Entity, leftDoor.Entity.Position + new BEPUutilities.Vector3(-0.5f, 0, 0), Vector3.UnitZ);
+            angularJoint.IsActive = true;
+            angularJoint.Motor.Settings.Mode = BEPUphysics.Constraints.TwoEntity.Motors.MotorMode.Servomechanism;
+            angularJoint.Motor.IsActive = true;
+            angularJoint.Motor.Basis.SetWorldAxes(-Vector3.UnitZ, Vector3.UnitY);
+            //angularJoint.Limit.MinimumAngle = 0;
+            //angularJoint.Limit.MaximumAngle = MathHelper.PiOver2;
+            //angularJoint.Limit.IsActive = true;
+            GameManager.Space.Add(angularJoint);
+            leftDoor.Texture.GameProperties.SetStateObject(angularJoint);
+
+            GameModel rightDoor = new GameModel(new Vector3(0.5f, 36.8f, 7), Loader.RightDoor,
+                new GameTexture("Door", Loader.DoorTexture,
+                    new PhysicsProperties(null, null, null, 900, false, true),
+                    new GameProperties(doorUpdate, null, false, null, null)), false);
+            rightDoor.Entity.CollisionInformation.CollisionRules.Group = GameModel.FunctionalGroup;
+            //rightDoor.Entity.CollisionInformation.LocalPosition = new BEPUutilities.Vector3(-0.5f, 0, 0);
+            angularJoint = new RevoluteJoint(e, rightDoor.Entity, rightDoor.Entity.Position - new BEPUutilities.Vector3(-0.5f, 0, 0), Vector3.UnitZ);
+            angularJoint.IsActive = true;
+            angularJoint.Motor.Settings.Mode = BEPUphysics.Constraints.TwoEntity.Motors.MotorMode.Servomechanism;
+            angularJoint.Motor.IsActive = true;
+            //angularJoint.Limit.MinimumAngle = 0;
+            //angularJoint.Limit.MaximumAngle = MathHelper.PiOver2;
+            //angularJoint.Limit.IsActive = true;
+            GameManager.Space.Add(angularJoint);
+            rightDoor.Texture.GameProperties.SetStateObject(angularJoint);
 
             Renderer.Add(tree);
-            Renderer.Add(ball);
+            Renderer.Add(tree2);
+            //Renderer.Add(ball);
             Renderer.Add(orange);
-            Renderer.Add(anvil);
+            //Renderer.Add(anvil);
+            Renderer.Add(leftDoor);
+            Renderer.Add(rightDoor);
+            Renderer.Add(button);
             GameManager.Space.Add(tree);
-            GameManager.Space.Add(ball);
+            GameManager.Space.Add(tree2);
+            //GameManager.Space.Add(ball);
             GameManager.Space.Add(orange);
-            GameManager.Space.Add(anvil);
+            GameManager.Space.Add(leftDoor);
+            GameManager.Space.Add(rightDoor);
+            GameManager.Space.Add(button);
+            //GameManager.Space.Add(anvil);
         }
 
         private void createCharacter()

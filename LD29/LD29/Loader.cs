@@ -52,6 +52,10 @@ namespace LD29
         public Model Anvil;
         public Model Water;
         public Model Burst;
+        public Model Level1;
+        public Model LeftDoor;
+        public Model RightDoor;
+        public Model Button;
         #endregion
 
         #region model textures
@@ -59,6 +63,9 @@ namespace LD29
         public Texture2D TreeTexture;
         public Texture2D OrangeTexture;
         public Texture2D AnvilTexture;
+        public Texture2D ButtonTexture;
+        public Texture2D DoorTexture;
+        public Texture2D EmancipatorTexture;
         #endregion
 
         public Loader(ContentManager content)
@@ -68,7 +75,7 @@ namespace LD29
 
         public IEnumerator<float> GetEnumerator()
         {
-            totalItems = 9 + 2 + 7 + 5;
+            totalItems = 9 + 2 + 11 + 8;
 
             #region Font
             Font = content.Load<SpriteFont>("font/font");
@@ -127,6 +134,14 @@ namespace LD29
             yield return progress();
             Burst = content.Load<Model>("models/burst");
             yield return progress();
+            Button = content.Load<Model>("models/button");
+            yield return progress();
+            Level1 = content.Load<Model>("models/level1");
+            yield return progress();
+            LeftDoor = content.Load<Model>("models/door_left");
+            yield return progress();
+            RightDoor = content.Load<Model>("models/door_right");
+            yield return progress();
             #endregion
 
             #region model textures
@@ -139,6 +154,12 @@ namespace LD29
             AnvilTexture = content.Load<Texture2D>("textures/anvil_tex");
             yield return progress();
             TabletopDotPNG = content.Load<Texture2D>("textures/underwater");
+            yield return progress();
+            EmancipatorTexture = content.Load<Texture2D>("textures/emancipator");
+            yield return progress();
+            DoorTexture = content.Load<Texture2D>("textures/door_tex");
+            yield return progress();
+            ButtonTexture = content.Load<Texture2D>("textures/button_tex");
             yield return progress();
             #endregion
         }

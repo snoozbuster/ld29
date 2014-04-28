@@ -163,7 +163,7 @@ namespace LD29
                 GameTexture t = targetedModel.RipTexture();
                 GameTexture burstTex = new GameTexture("Burst", t.ActualTexture,
                     new PhysicsProperties(0, 0.5f, 0.5f, 10, false, true),
-                    new GameProperties(null, null, false));
+                    new GameProperties(null, null, false, null, null));
                 GameModel m = new GameModel(targetedModel.Entity.Position, missileModel, burstTex, false);
                 m.Entity.CollisionInformation.CollisionRules.Group = noCollisionGroup;
                 CollisionRules.AddRule(m.Entity, character.CharacterController.Body, CollisionRule.NoSolver);
@@ -179,7 +179,7 @@ namespace LD29
                 GameTexture t = heldTextures[textureIndex];
                 GameTexture burstTex = new GameTexture("Burst", t.ActualTexture,
                     new PhysicsProperties(0, 0.5f, 0.5f, 10, false, true),
-                    new GameProperties(null, null, false));
+                    new GameProperties(null, null, false, null, null));
                 GameModel m = new GameModel(character.CharacterController.Body.Position, missileModel, burstTex, false);
                 m.Entity.CollisionInformation.CollisionRules.Group = noCollisionGroup;
                 CollisionRules.AddRule(m.Entity, targetedModel.Entity, CollisionRule.NoSolver);

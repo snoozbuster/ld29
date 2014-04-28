@@ -18,12 +18,15 @@ namespace LD29
 
         public GameModel CurrentModel;
 
-        public GameTexture(string name, Texture2D texture, PhysicsProperties pp = new PhysicsProperties(), GameProperties gp = new GameProperties(), GraphicsProperties ggp = new GraphicsProperties())
+        public GameTexture(string name, Texture2D texture, PhysicsProperties pp = new PhysicsProperties(), GameProperties gp = null, GraphicsProperties ggp = new GraphicsProperties())
         {
             FriendlyName = name;
             ActualTexture = texture;
             PhysicsProperties = pp;
-            GameProperties = gp;
+            if(gp == null)
+                GameProperties = new GameProperties(null, null, null, null, null);
+            else
+                GameProperties = gp;
             GraphicsProperties = ggp;
         }
 
@@ -36,17 +39,19 @@ namespace LD29
 
             if(oldTex != null)
             {
-                foreach(var d in oldTex.GameProperties.CollisionHandlers)
-                    m.Entity.CollisionInformation.Events.InitialCollisionDetected -= d;
+                m.Entity.CollisionInformation.Events.InitialCollisionDetected -= oldTex.GameProperties.CollisionHandler;
+                m.Entity.CollisionInformation.Events.CollisionEnded -= oldTex.GameProperties.EndCollisionHandler;
                 if(m.Space != null)
-                    m.Space.DuringForcesUpdateables.Starting -= oldTex.GameProperties.Update;
+                    m.Space.DuringForcesUpdateables.Starting -= oldTex.GameProperties.SpaceUpdate;
             }
-            foreach(var d in GameProperties.CollisionHandlers)
-                m.Entity.CollisionInformation.Events.InitialCollisionDetected += d;
+            m.Entity.CollisionInformation.Events.InitialCollisionDetected += GameProperties.CollisionHandler;
+            m.Entity.CollisionInformation.Events.CollisionEnded += GameProperties.EndCollisionHandler;
             if(m.Space != null)
-                m.Space.DuringForcesUpdateables.Starting += GameProperties.Update;
+                m.Space.DuringForcesUpdateables.Starting += GameProperties.SpaceUpdate;
 
             CurrentModel = m;
+
+            GameProperties.OnTextureApplied(m);
         }
     }
 }

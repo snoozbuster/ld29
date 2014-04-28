@@ -13,12 +13,16 @@ namespace LD29
     {
         public readonly static CollisionGroup NormalGroup = new CollisionGroup();
         public readonly static CollisionGroup GhostGroup = new CollisionGroup();
+        public readonly static CollisionGroup TerrainGroup = new CollisionGroup();
+        public readonly static CollisionGroup FunctionalGroup = new CollisionGroup();
 
         static GameModel()
         {
             CollisionGroup.DefineCollisionRule(NormalGroup, GhostGroup, CollisionRule.NoBroadPhase);
             CollisionGroup.DefineCollisionRule(NormalGroup, NormalGroup, CollisionRule.Normal);
             CollisionGroup.DefineCollisionRule(GhostGroup, GhostGroup, CollisionRule.Normal);
+            CollisionGroup.DefineCollisionRule(TerrainGroup, FunctionalGroup, CollisionRule.NoBroadPhase);
+            CollisionGroup.DefineCollisionRule(FunctionalGroup, FunctionalGroup, CollisionRule.NoBroadPhase);
         }
         
         public Entity Entity { get; private set; }
@@ -70,6 +74,7 @@ namespace LD29
                 throw new InvalidOperationException("Can't rip an unrippable texture!");
 
             GameTexture output = Texture;
+            output.GameProperties.OnTextureRipped(this);
             output.CurrentModel = null;
             Texture = new GameTexture("Wireframe", Texture.ActualTexture) { Wireframe = true };
             Entity.AngularVelocity = Entity.LinearVelocity = Vector3.Zero;
@@ -88,13 +93,13 @@ namespace LD29
         public void OnAdditionToSpace(Space newSpace)
         {
             newSpace.Add(Entity);
-            newSpace.DuringForcesUpdateables.Starting += Texture.GameProperties.Update;
+            newSpace.DuringForcesUpdateables.Starting += Texture.GameProperties.SpaceUpdate;
         }
 
         public void OnRemovalFromSpace(Space oldSpace)
         {
             oldSpace.Remove(Entity);
-            oldSpace.DuringForcesUpdateables.Starting -= Texture.GameProperties.Update;
+            oldSpace.DuringForcesUpdateables.Starting -= Texture.GameProperties.SpaceUpdate;
         }
 
         public Space Space { get; set; }

@@ -125,9 +125,9 @@ namespace LD29
 
 #if DEBUG
             drawAxes();
-            //if(Camera.Debug)
-            //    foreach(Entity e in Space.Entities)
-            //        e.CollisionInformation.BoundingBox.Draw();
+            if(Camera.Debug)
+                foreach(Entity e in Space.Entities)
+                    e.CollisionInformation.BoundingBox.Draw();
 #endif
 
             setForTransparency();
