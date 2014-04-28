@@ -56,6 +56,8 @@ namespace LD29
         public Model LeftDoor;
         public Model RightDoor;
         public Model Button;
+        public Model Rubble;
+        public Model Fridge;
         #endregion
 
         #region model textures
@@ -65,6 +67,8 @@ namespace LD29
         public Texture2D AnvilTexture;
         public Texture2D ButtonTexture;
         public Texture2D DoorTexture;
+        public Texture2D FridgeTexture;
+        public Texture2D RubbleTexture;
         public Texture2D EmancipatorTexture;
         #endregion
 
@@ -75,7 +79,7 @@ namespace LD29
 
         public IEnumerator<float> GetEnumerator()
         {
-            totalItems = 9 + 2 + 11 + 8;
+            totalItems = 9 + 2 + 13 + 10;
 
             #region Font
             Font = content.Load<SpriteFont>("font/font");
@@ -142,6 +146,10 @@ namespace LD29
             yield return progress();
             RightDoor = content.Load<Model>("models/door_right");
             yield return progress();
+            Rubble = content.Load<Model>("models/rubble");
+            yield return progress();
+            Fridge = content.Load<Model>("models/fridge");
+            yield return progress();
             #endregion
 
             #region model textures
@@ -160,6 +168,10 @@ namespace LD29
             DoorTexture = content.Load<Texture2D>("textures/door_tex");
             yield return progress();
             ButtonTexture = content.Load<Texture2D>("textures/button_tex");
+            yield return progress();
+            RubbleTexture = content.Load<Texture2D>("textures/scraps_tex");
+            yield return progress();
+            FridgeTexture = content.Load<Texture2D>("textures/fridge");
             yield return progress();
             #endregion
         }
