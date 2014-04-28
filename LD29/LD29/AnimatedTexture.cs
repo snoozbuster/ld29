@@ -50,7 +50,7 @@ namespace LD29
 
         public void Draw()
         {
-            RenderingDevice.SpriteBatch.Begin();
+            RenderingDevice.SpriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null);
             RenderingDevice.SpriteBatch.Draw(frames[Done ? currentIndex - 1 : currentIndex], screenRect, Color.White);
             RenderingDevice.SpriteBatch.End();
         }

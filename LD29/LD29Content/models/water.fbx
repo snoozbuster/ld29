@@ -10,10 +10,10 @@ FBXHeaderExtension:  {
 		Version: 1000
 		Year: 2014
 		Month: 04
-		Day: 26
-		Hour: 19
-		Minute: 20
-		Second: 05
+		Day: 27
+		Hour: 23
+		Minute: 23
+		Second: 58
 		Millisecond: 0
 	}
 	Creator: "FBX SDK/FBX Plugins build 20070228"
@@ -21,7 +21,7 @@ FBXHeaderExtension:  {
 		FlagPLE: 0
 	}
 }
-CreationTime: "2014-04-26 19:20:05:000"
+CreationTime: "2014-04-27 23:23:58:000"
 Creator: "Blender version 2.68 (sub 0)"
 
 ; Object definitions
@@ -57,14 +57,14 @@ Definitions:  {
 ;------------------------------------------------------------------
 
 Objects:  {
-	Model: "Model::Plane_002", "Mesh" {
+	Model: "Model::Plane_003", "Mesh" {
 		Version: 232
 		Properties60:  {
 			Property: "QuaternionInterpolate", "bool", "",0
 			Property: "Visibility", "Visibility", "A+",1
 			Property: "Lcl Translation", "Lcl Translation", "A+",0.000000000000000,0.000000000000000,0.000000000000000
 			Property: "Lcl Rotation", "Lcl Rotation", "A+",0.000000000000000,-0.000000000000000,0.000000000000000
-			Property: "Lcl Scaling", "Lcl Scaling", "A+",6.000000000000000,6.000000000000000,1.000000000000000
+			Property: "Lcl Scaling", "Lcl Scaling", "A+",0.993604600429535,0.963094651699066,1.000000000000000
 			Property: "RotationOffset", "Vector3D", "",0,0,0
 			Property: "RotationPivot", "Vector3D", "",0,0,0
 			Property: "ScalingOffset", "Vector3D", "",0,0,0
@@ -136,7 +136,7 @@ Objects:  {
 		MultiTake: 1
 		Shading: Y
 		Culling: "CullingOff"
-		Vertices: 4.202400,-4.187046,2.500000,2.202400,-4.187046,2.500000,4.202400,-2.187046,2.500000,2.202400,-2.187046,2.500000
+		Vertices: 50.488342,51.432938,-5.000000,30.359612,51.432938,-5.000000,50.488342,64.931091,-5.000000,30.359612,64.931091,-5.000000
 		PolygonVertexIndex: 1,0,2,-4
 		Edges: 
 		GeometryVersion: 124
@@ -279,8 +279,8 @@ Objects:  {
 		}
 		NbPoseNodes: 1
 		PoseNode:  {
-			Node: "Model::Plane_002"
-			Matrix: 6.000000000000000,0.000000000000000,0.000000000000000,0.000000000000000,0.000000000000000,6.000000000000000,0.000000000000000,0.000000000000000,0.000000000000000,0.000000000000000,1.000000000000000,0.000000000000000,0.000000000000000,0.000000000000000,0.000000000000000,1.000000000000000
+			Node: "Model::Plane_003"
+			Matrix: 0.993604600429535,0.000000000000000,0.000000000000000,0.000000000000000,0.000000000000000,0.963094651699066,0.000000000000000,0.000000000000000,0.000000000000000,0.000000000000000,1.000000000000000,0.000000000000000,0.000000000000000,0.000000000000000,0.000000000000000,1.000000000000000
 		}
 	}
 	GlobalSettings:  {
@@ -301,7 +301,7 @@ Objects:  {
 ;------------------------------------------------------------------
 
 Relations:  {
-	Model: "Model::Plane_002", "Mesh" {
+	Model: "Model::Plane_003", "Mesh" {
 	}
 	Model: "Model::Producer Perspective", "Camera" {
 	}
@@ -331,9 +331,9 @@ Relations:  {
 ;------------------------------------------------------------------
 
 Connections:  {
-	Connect: "OO", "Model::Plane_002", "Model::Scene"
-	Connect: "OO", "Material::None__tabletop_png", "Model::Plane_002"
-	Connect: "OO", "Texture::tabletop_png", "Model::Plane_002"
+	Connect: "OO", "Model::Plane_003", "Model::Scene"
+	Connect: "OO", "Material::None__tabletop_png", "Model::Plane_003"
+	Connect: "OO", "Texture::tabletop_png", "Model::Plane_003"
 	Connect: "OO", "Video::tabletop_png", "Texture::tabletop_png"
 }
 ;Takes and animation section

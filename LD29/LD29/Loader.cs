@@ -51,13 +51,17 @@ namespace LD29
         public Model Tree;
         public Model Anvil;
         public Model Water;
+        public Model Water2;
         public Model Burst;
         public Model Level1;
         public Model LeftDoor;
+        public Model LeftDoorAlt;
         public Model RightDoor;
+        public Model RightDoorAlt;
         public Model Button;
         public Model Rubble;
         public Model Fridge;
+        public Model Board;
         #endregion
 
         #region model textures
@@ -70,7 +74,12 @@ namespace LD29
         public Texture2D FridgeTexture;
         public Texture2D RubbleTexture;
         public Texture2D EmancipatorTexture;
+        public Texture2D PurpleDoorTexture;
+        public Texture2D PurpleButtonTexture;
+        public Texture2D SeecretTexture;
         #endregion
+
+        public Texture2D[] AnimationFrames;
 
         public Loader(ContentManager content)
         {
@@ -79,7 +88,7 @@ namespace LD29
 
         public IEnumerator<float> GetEnumerator()
         {
-            totalItems = 9 + 2 + 13 + 10;
+            totalItems = 9 + 2 + 17 + 13 + 31;
 
             #region Font
             Font = content.Load<SpriteFont>("font/font");
@@ -136,6 +145,8 @@ namespace LD29
             yield return progress();
             Water = content.Load<Model>("models/water");
             yield return progress();
+            Water2 = content.Load<Model>("models/water2");
+            yield return progress();
             Burst = content.Load<Model>("models/burst");
             yield return progress();
             Button = content.Load<Model>("models/button");
@@ -146,9 +157,15 @@ namespace LD29
             yield return progress();
             RightDoor = content.Load<Model>("models/door_right");
             yield return progress();
+            LeftDoorAlt = content.Load<Model>("models/door_left_alt");
+            yield return progress();
+            RightDoorAlt = content.Load<Model>("models/door_right_alt");
+            yield return progress();
             Rubble = content.Load<Model>("models/rubble");
             yield return progress();
             Fridge = content.Load<Model>("models/fridge");
+            yield return progress();
+            Board = content.Load<Model>("models/board");
             yield return progress();
             #endregion
 
@@ -173,6 +190,25 @@ namespace LD29
             yield return progress();
             FridgeTexture = content.Load<Texture2D>("textures/fridge");
             yield return progress();
+            PurpleDoorTexture = content.Load<Texture2D>("textures/door2_tex");
+            yield return progress();
+            PurpleButtonTexture = content.Load<Texture2D>("textures/button2_tex");
+            yield return progress();
+            SeecretTexture = content.Load<Texture2D>("textures/lololol");
+            yield return progress();
+            #endregion
+
+            #region animation
+            AnimationFrames = new Texture2D[33];
+            AnimationFrames[0] = content.Load<Texture2D>("animation/blank");
+            yield return progress();
+            for(int i = 2; i <= 32; i++)
+            {
+                if(i == 21)
+                    continue;
+                AnimationFrames[i] = content.Load<Texture2D>("animation/" + (i < 10 ? "0" : "") + i);
+                yield return progress();
+            }
             #endregion
         }
 

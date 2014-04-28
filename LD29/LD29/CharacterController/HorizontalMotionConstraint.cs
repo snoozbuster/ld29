@@ -74,7 +74,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         }
 
 
-        float speed = 8f;
+        float speed = 6.5f;
         /// <summary>
         /// Gets or sets the maximum speed at which the character can move while standing with a support that provides traction.
         /// Relative velocities with a greater magnitude will be decelerated.
@@ -110,7 +110,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 crouchingSpeed = value;
             }
         }
-        float slidingSpeed = 6;
+        float slidingSpeed = 5;
         /// <summary>
         /// Gets or sets the maximum speed at which the character can move while on a support that does not provide traction.
         /// Relative velocities with a greater magnitude will be decelerated.

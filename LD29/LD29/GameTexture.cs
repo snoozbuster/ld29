@@ -16,7 +16,8 @@ namespace LD29
         public PhysicsProperties PhysicsProperties { get; private set; }
         public string FriendlyName { get; private set; }
 
-        public GameModel CurrentModel;
+        public GameModel CurrentModel { get { return CurrentModel; } set { currentModel = value; GameProperties.OwningModel = value; } }
+        private GameModel currentModel;
 
         public GameTexture(string name, Texture2D texture, PhysicsProperties pp = new PhysicsProperties(), GameProperties gp = null, GraphicsProperties ggp = new GraphicsProperties())
         {

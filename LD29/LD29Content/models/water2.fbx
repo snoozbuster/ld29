@@ -10,10 +10,10 @@ FBXHeaderExtension:  {
 		Version: 1000
 		Year: 2014
 		Month: 04
-		Day: 28
-		Hour: 01
-		Minute: 36
-		Second: 09
+		Day: 27
+		Hour: 23
+		Minute: 24
+		Second: 04
 		Millisecond: 0
 	}
 	Creator: "FBX SDK/FBX Plugins build 20070228"
@@ -21,7 +21,7 @@ FBXHeaderExtension:  {
 		FlagPLE: 0
 	}
 }
-CreationTime: "2014-04-28 01:36:09:000"
+CreationTime: "2014-04-27 23:24:04:000"
 Creator: "Blender version 2.68 (sub 0)"
 
 ; Object definitions
@@ -29,7 +29,7 @@ Creator: "Blender version 2.68 (sub 0)"
 
 Definitions:  {
 	Version: 100
-	Count: 3
+	Count: 5
 	ObjectType: "Model" {
 		Count: 1
 	}
@@ -37,6 +37,12 @@ Definitions:  {
 		Count: 1
 	}
 	ObjectType: "Material" {
+		Count: 1
+	}
+	ObjectType: "Texture" {
+		Count: 1
+	}
+	ObjectType: "Video" {
 		Count: 1
 	}
 	ObjectType: "Pose" {
@@ -51,14 +57,14 @@ Definitions:  {
 ;------------------------------------------------------------------
 
 Objects:  {
-	Model: "Model::Cube_001", "Mesh" {
+	Model: "Model::Plane", "Mesh" {
 		Version: 232
 		Properties60:  {
 			Property: "QuaternionInterpolate", "bool", "",0
 			Property: "Visibility", "Visibility", "A+",1
 			Property: "Lcl Translation", "Lcl Translation", "A+",0.000000000000000,0.000000000000000,0.000000000000000
 			Property: "Lcl Rotation", "Lcl Rotation", "A+",0.000000000000000,-0.000000000000000,0.000000000000000
-			Property: "Lcl Scaling", "Lcl Scaling", "A+",1.000000000000000,1.000000000000000,1.000000000000000
+			Property: "Lcl Scaling", "Lcl Scaling", "A+",1.030017614364624,0.967174112796783,1.000000000000000
 			Property: "RotationOffset", "Vector3D", "",0,0,0
 			Property: "RotationPivot", "Vector3D", "",0,0,0
 			Property: "ScalingOffset", "Vector3D", "",0,0,0
@@ -130,9 +136,8 @@ Objects:  {
 		MultiTake: 1
 		Shading: Y
 		Culling: "CullingOff"
-		Vertices: -0.275000,-0.275000,-0.075000,-0.275000,0.275000,-0.075000,0.275000,0.275000,-0.075000,0.275000,-0.275000,-0.075000,-0.275000,-0.275000,0.075000,-0.275000,0.275000,0.075000,0.275000,0.275000,0.075000
-		,0.275000,-0.275000,0.075000
-		PolygonVertexIndex: 1,0,4,-6,5,6,2,-2,6,7,3,-3,0,3,7,-5,7,6,5,-5
+		Vertices: 77.223434,10.678803,-5.000000,67.514862,10.678803,-5.000000,77.223434,31.357605,-5.000000,67.514862,31.357605,-5.000000
+		PolygonVertexIndex: 1,0,2,-4
 		Edges: 
 		GeometryVersion: 124
 		LayerElementNormal: 0 {
@@ -140,29 +145,25 @@ Objects:  {
 			Name: ""
 			MappingInformationType: "ByVertice"
 			ReferenceInformationType: "Direct"
-			Normals: -0.707083344459534,-0.707083344459534,0.000000000000000,-0.707083344459534,0.707083344459534,0.000000000000000
-			 ,0.707083344459534,0.707083344459534,0.000000000000000,0.707083344459534,-0.707083344459534,0.000000000000000
-			 ,-0.577349185943604,-0.577349185943604,0.577349185943604,-0.577349185943604,0.577349185943604,0.577349185943604
-			 ,0.577349185943604,0.577349185943604,0.577349185943604,0.577349185943604,-0.577349185943604,0.577349185943604
+			Normals: 0.000000000000000,0.000000000000000,1.000000000000000,0.000000000000000,0.000000000000000,1.000000000000000
+			 ,0.000000000000000,0.000000000000000,1.000000000000000,0.000000000000000,0.000000000000000,1.000000000000000
 		}
 		LayerElementUV: 0 {
 			Version: 101
 			Name: "UVMap"
 			MappingInformationType: "ByPolygonVertex"
 			ReferenceInformationType: "IndexToDirect"
-			UV: 0.000000,1.000000,0.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,1.000000,1.000000,1.000000,1.000000,1.000000
-			 ,0.000000,1.000000,1.000000,1.000000,1.000000,0.000000,1.000000,0.000000,1.000000,1.000000,0.000000,0.000000,1.000000,0.000000
-			 ,1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,1.000000,1.000000,0.000000,1.000000,0.000000,0.000000
-			UVIndex: 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
+			UV: 0.000000,0.000000,1.000000,0.000000,1.000000,1.000000,0.000000,1.000000
+			UVIndex: 0,1,2,3
 		}
 		LayerElementTexture: 0 {
 			Version: 101
-			Name: ""
-			MappingInformationType: "NoMappingInformation"
+			Name: "UVMap"
+			MappingInformationType: "AllSame"
 			ReferenceInformationType: "IndexToDirect"
 			BlendMode: "Translucent"
 			TextureAlpha: 1
-			TextureId: 
+			TextureId: 0
 		}
 		LayerElementMaterial: 0 {
 			Version: 101
@@ -182,12 +183,16 @@ Objects:  {
 				TypedIndex: 0
 			}
 			LayerElement:  {
+				Type: "LayerElementTexture"
+				TypedIndex: 0
+			}
+			LayerElement:  {
 				Type: "LayerElementUV"
 				TypedIndex: 0
 			}
 		}
 	}
-	Material: "Material::unnamed", "" {
+	Material: "Material::None__tabletop_png", "" {
 		Version: 102
 		ShadingModel: "phong"
 		MultiLayer: 0
@@ -217,6 +222,56 @@ Objects:  {
 			Property: "Reflectivity", "double", "",0
 		}
 	}
+	Video: "Video::tabletop_png", "Clip" {
+		Type: "Clip"
+		Properties60:  {
+			Property: "FrameRate", "double", "",0
+			Property: "LastFrame", "int", "",0
+			Property: "Width", "int", "",0
+			Property: "Height", "int", "",0
+			Property: "Path", "charptr", "", "../textures/tabletop.png"
+			Property: "StartFrame", "int", "",0
+			Property: "StopFrame", "int", "",0
+			Property: "PlaySpeed", "double", "",1
+			Property: "Offset", "KTime", "",0
+			Property: "InterlaceMode", "enum", "",0
+			Property: "FreeRunning", "bool", "",0
+			Property: "Loop", "bool", "",0
+			Property: "AccessMode", "enum", "",0
+		}
+		UseMipMap: 0
+		Filename: "../textures/tabletop.png"
+		RelativeFilename: "../textures/tabletop.png"
+	}
+	Texture: "Texture::tabletop_png", "TextureVideoClip" {
+		Type: "TextureVideoClip"
+		Version: 202
+		TextureName: "Texture::tabletop_png"
+		Properties60:  {
+			Property: "Translation", "Vector", "A+",0,0,0
+			Property: "Rotation", "Vector", "A+",0,0,0
+			Property: "Scaling", "Vector", "A+",1,1,1
+			Property: "Texture alpha", "Number", "A+",0
+			Property: "TextureTypeUse", "enum", "",0
+			Property: "CurrentTextureBlendMode", "enum", "",1
+			Property: "UseMaterial", "bool", "",0
+			Property: "UseMipMap", "bool", "",0
+			Property: "CurrentMappingType", "enum", "",0
+			Property: "UVSwap", "bool", "",0
+			Property: "WrapModeU", "enum", "",0
+			Property: "WrapModeV", "enum", "",0
+			Property: "TextureRotationPivot", "Vector3D", "",0,0,0
+			Property: "TextureScalingPivot", "Vector3D", "",0,0,0
+			Property: "VideoProperty", "object", ""
+		}
+		Media: "Video::tabletop_png"
+		FileName: "../textures/tabletop.png"
+		RelativeFilename: "../textures/tabletop.png"
+		ModelUVTranslation: 0,0
+		ModelUVScaling: 1,1
+		Texture_Alpha_Source: "None"
+		Cropping: 0,0,0,0
+	}
 	Pose: "Pose::BIND_POSES", "BindPose" {
 		Type: "BindPose"
 		Version: 100
@@ -224,8 +279,8 @@ Objects:  {
 		}
 		NbPoseNodes: 1
 		PoseNode:  {
-			Node: "Model::Cube_001"
-			Matrix: 1.000000000000000,0.000000000000000,0.000000000000000,0.000000000000000,0.000000000000000,1.000000000000000,0.000000000000000,0.000000000000000,0.000000000000000,0.000000000000000,1.000000000000000,0.000000000000000,0.000000000000000,0.000000000000000,0.000000000000000,1.000000000000000
+			Node: "Model::Plane"
+			Matrix: 1.030017614364624,0.000000000000000,0.000000000000000,0.000000000000000,0.000000000000000,0.967173993587494,0.000000000000000,0.000000000000000,0.000000000000000,0.000000000000000,1.000000000000000,0.000000000000000,0.000000000000000,0.000000000000000,0.000000000000000,1.000000000000000
 		}
 	}
 	GlobalSettings:  {
@@ -246,7 +301,7 @@ Objects:  {
 ;------------------------------------------------------------------
 
 Relations:  {
-	Model: "Model::Cube_001", "Mesh" {
+	Model: "Model::Plane", "Mesh" {
 	}
 	Model: "Model::Producer Perspective", "Camera" {
 	}
@@ -264,7 +319,11 @@ Relations:  {
 	}
 	Model: "Model::Camera Switcher", "CameraSwitcher" {
 	}
-	Material: "Material::unnamed", "" {
+	Material: "Material::None__tabletop_png", "" {
+	}
+	Texture: "Texture::tabletop_png", "TextureVideoClip" {
+	}
+	Video: "Video::tabletop_png", "Clip" {
 	}
 }
 
@@ -272,8 +331,10 @@ Relations:  {
 ;------------------------------------------------------------------
 
 Connections:  {
-	Connect: "OO", "Model::Cube_001", "Model::Scene"
-	Connect: "OO", "Material::unnamed", "Model::Cube_001"
+	Connect: "OO", "Model::Plane", "Model::Scene"
+	Connect: "OO", "Material::None__tabletop_png", "Model::Plane"
+	Connect: "OO", "Texture::tabletop_png", "Model::Plane"
+	Connect: "OO", "Video::tabletop_png", "Texture::tabletop_png"
 }
 ;Takes and animation section
 ;----------------------------------------------------

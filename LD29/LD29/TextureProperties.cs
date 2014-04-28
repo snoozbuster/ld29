@@ -41,7 +41,7 @@ namespace LD29
         }
 
         // all defaults
-        public PhysicsProperties WireframeProperties { get { return new PhysicsProperties(null, null, null, null, null, null); } }
+        public static PhysicsProperties WireframeProperties { get { return new PhysicsProperties(null, null, null, null, null, null); } }
     }
 
     struct GraphicsProperties
@@ -58,7 +58,7 @@ namespace LD29
             this.transparent = transparent;
         }
 
-        public GraphicsProperties WireframeProperties { get { return new GraphicsProperties(null, null); } }
+        public static GraphicsProperties WireframeProperties { get { return new GraphicsProperties(null, null); } }
     }
 
     class GameProperties
@@ -103,18 +103,20 @@ namespace LD29
         /// Called when a texture is ripped from a model, while the texture is still applied to the model.
         /// </summary>
         public Action<GameModel> OnTextureRipped { get { if(onTextureRipped == null) onTextureRipped = x => { }; return onTextureRipped; } }
-        public Action<GameModel> onTextureRipped;
+        private Action<GameModel> onTextureRipped;
 
         /// <summary>
         /// Called when a texture is applied to a model, after the texture is applied to the model.
         /// </summary>
         public Action<GameModel> OnTextureApplied { get { if(onTextureApplied == null) onTextureApplied = x => { }; return onTextureApplied; } }
-        public Action<GameModel> onTextureApplied;
+        private Action<GameModel> onTextureApplied;
 
         /// <summary>
         /// State object to store information in.
         /// </summary>
         public object UpdateStateObject;
+
+        public GameModel OwningModel = null;
 
         public GameProperties(Action<GameProperties> update, Action rayCast, bool? grabbable, 
             InitialCollisionDetectedEventHandler<EntityCollidable> collisionHandler, 
@@ -138,6 +140,6 @@ namespace LD29
             UpdateStateObject = obj;
         }
 
-        public GameProperties WireframeProperties { get { return new GameProperties(null, null, null, null, null); } }
+        public static GameProperties WireframeProperties { get { return new GameProperties(null, null, false, null, null); } }
     }
 }

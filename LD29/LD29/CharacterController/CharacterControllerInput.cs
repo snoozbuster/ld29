@@ -168,7 +168,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
                 //Update grabber
 
-            if (((Input.ControlScheme == ControlScheme.XboxController && Input.CurrentPad.IsButtonDown(Buttons.X)) ||
+            if (((Input.ControlScheme == ControlScheme.XboxController && Input.CheckXboxJustPressed(Buttons.X)) ||
                  (Input.ControlScheme == ControlScheme.Keyboard && Input.CheckKeyboardPress(Keys.E))) && !grabber.IsUpdating)
                 {
                     //Find the earliest ray hit
@@ -183,10 +183,10 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                             if(tag != null)
                             {
                                 tag.Texture.GameProperties.RayCastHit();
-                                if(tag.Texture.GameProperties.Grabbable)
+                                if(!tag.Texture.Wireframe && tag.Texture.GameProperties.Grabbable)
                                 {
                                     grabber.Setup(entityCollision.Entity, raycastResult.HitData.Location);
-                                    grabDistance = 3.5f;
+                                    grabDistance = raycastResult.HitData.T;
                                 }
                             }
                         }
@@ -195,7 +195,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 }
                 else if(grabber.IsUpdating)
                 {
-                    if((Input.ControlScheme == ControlScheme.XboxController && Input.CurrentPad.IsButtonDown(Buttons.X)) ||
+                    if((Input.ControlScheme == ControlScheme.XboxController && Input.CheckXboxJustPressed(Buttons.X)) ||
                         (Input.ControlScheme == ControlScheme.Keyboard && Input.CheckKeyboardPress(Keys.E)))
                         grabber.Release();
                     grabber.GoalPosition = Renderer.Camera.Position + Renderer.Camera.WorldMatrix.Forward * grabDistance;

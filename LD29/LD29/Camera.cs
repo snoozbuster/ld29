@@ -119,7 +119,8 @@ namespace BEPUphysicsDemos
         /// <param name="projectionMatrix">Projection matrix used.</param>
         public Camera(BaseGame g)
         {
-            Position = new Vector3(-1, -16, 6);
+            //Position = new Vector3(-1, -16, 6);
+            Position = new Vector3(48, -20, 10);
             Yaw(-MathHelper.PiOver2);
             Pitch(0);
             ProjectionMatrix = MathConverter.Convert(Microsoft.Xna.Framework.Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, g.GraphicsDevice.Viewport.AspectRatio, .1f, 10000));
