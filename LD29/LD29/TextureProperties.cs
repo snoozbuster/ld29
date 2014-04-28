@@ -93,8 +93,8 @@ namespace LD29
         /// <summary>
         /// Called when the player 'interacts' with this object. Useful for switches or other non-grabbable objects.
         /// </summary>
-        public Action RayCastHit { get { return rayCastHit == null ? emptyFunction : rayCastHit; } }
-        private Action rayCastHit;
+        public Action<GameProperties> RayCastHit { get { if(rayCastHit == null) rayCastHit = x => { }; return rayCastHit; } }
+        private Action<GameProperties> rayCastHit;
 
         public bool Grabbable { get { return grabbable.HasValue ? grabbable.Value : true; } }
         private bool? grabbable;
@@ -118,7 +118,7 @@ namespace LD29
 
         public GameModel OwningModel = null;
 
-        public GameProperties(Action<GameProperties> update, Action rayCast, bool? grabbable, 
+        public GameProperties(Action<GameProperties> update, Action<GameProperties> rayCast, bool? grabbable, 
             InitialCollisionDetectedEventHandler<EntityCollidable> collisionHandler, 
             CollisionEndedEventHandler<EntityCollidable> collisionEndingHandler,
             Action<GameModel> onTextureRipped = null,

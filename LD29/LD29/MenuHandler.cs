@@ -45,6 +45,7 @@ namespace LD29
             exitMenu = new ExitMenu();
             queryMenu = new GamePadQueryMenu();
             instructionsMenu = new InstructionsMenu();
+            endingMenu = new EndingMenu();
         }
 
         public static void Draw(GameTime gameTime)
@@ -58,7 +59,6 @@ namespace LD29
                 case GameState.Paused: pauseMenu.Draw(gameTime);
                     break;
                 case GameState.Ending:
-                    mainMenu.Draw(gameTime);
                     endingMenu.Draw(gameTime);
                     break;
                 case GameState.Paused_DC:
@@ -760,135 +760,19 @@ namespace LD29
         #region Ending
         private class EndingMenu : Menu
         {
-            //protected Sprite[] credits;
-            //protected float alpha;
-            protected float time;
-            //protected bool moved;
-            //protected bool fadingOut;
+            public EndingMenu() { }
 
-            protected float screenAlpha = 255;
-
-            protected const float deltaA = 3;
-            protected const float secondsToPause = 3;
-
-            //protected Texture2D gradient;
-
-            //protected Rectangle topR;
-            //protected Rectangle bottomR;
-
-            protected Video end;
-
-            protected VideoPlayer player;
-
-            public EndingMenu(Video end)
-            {
-                this.end = end;
-                //credits = loader.Credits;
-                onGDMReset(this, EventArgs.Empty);
-                RenderingDevice.GDM.DeviceReset += onGDMReset;
-            }
-
-            private void onGDMReset(object sender, EventArgs e)
-            {
-                //gradient = new Texture2D(RenderingDevice.GraphicsDevice, 1, 20);
-                //Color[] colors = new Color[20];
-                //for(int i = 0; i < 5; i++)
-                //    colors[i] = new Color(0, 0, 0, 255);
-                //for(int i = 5; i < 20; i++)
-                //    colors[i] = new Color(0, 0, 0, 255 - ((255 / 15) * (i - 4)));
-                //gradient.SetData(colors);
-
-                player = new VideoPlayer();
-                player.Play(end);
-                player.Pause();
-            }
-
-            public override void Update(GameTime gameTime)
-            {
-                //if(!credits[0].Moving && !moved)
-                //{
-                //    moved = true;
-                //    credits[0].Move(new Vector2(0, -0.55f), 115);
-                //    credits[1].Move(new Vector2(0, -0.55f), 115);
-                //    topR = new Rectangle(0, 0, (int)RenderingDevice.Width, 20);
-                //    bottomR = new Rectangle(0, (int)RenderingDevice.Height - 20, (int)RenderingDevice.Width, 20);
-                //}
-
-                //for(int i = 0; i < credits.Length - 1; i++)
-                //    credits[i].ForceMoveUpdate(gameTime);
-
-                //if(!credits[0].Moving)
-                //{
-                //    if(alpha + deltaA > 255 && !fadingOut)
-                //    {
-                //        alpha = 255;
-                //        time += (float)gameTime.ElapsedGameTime.TotalSeconds;
-                //        if(time >= secondsToPause)
-                //        {
-                //            fadingOut = true;
-                //            time = 0;
-                //        }
-                //    }
-                //    else if(alpha - deltaA < 0 && fadingOut)
-                //    {
-                //        alpha = 0;
-                if(Program.Game.BGM.State == SoundState.Playing)
-                    Program.Game.BGM.Pause();
-
-                if(player.State == MediaState.Paused)
-                {
-                    player.Resume();
-                    using(RegistryKey k1 = Registry.CurrentUser.OpenSubKey("Software", true))
-                    using(RegistryKey k2 = k1.CreateSubKey("LD28_Travesty"))
-                        k2.SetValue("ending", (int)GameManager.State);
-                }
-                else if(player.State == MediaState.Stopped)
-                {
-                    mainMenu.Update(gameTime);
-                    time += (float)gameTime.ElapsedGameTime.TotalSeconds;
-                    if(time >= secondsToPause)
-                    {
-                        if(screenAlpha - deltaA < 0) // black background
-                        {
-                            Program.Game.BGM.Resume();
-                            GameManager.State = GameState.MainMenu;
-                            Reset();
-                        }
-                        else
-                            screenAlpha -= deltaA;
-                    }
-                }
-                //    }
-                //    else
-                //    {
-                //        alpha += deltaA * (fadingOut ? -1 : 1);
-                //    }
-                //}
-            }
+            public override void Update(GameTime gameTime) { }
 
             public override void Draw(GameTime gameTime)
             {
                 RenderingDevice.SpriteBatch.Begin();
 
-                RenderingDevice.SpriteBatch.Draw(loader.EmptyTex, new Rectangle(0, 0, (int)RenderingDevice.Width, (int)RenderingDevice.Height),
-                    new Color(0, 0, 0, screenAlpha) * (screenAlpha / 255f));
-                //for(int i = 0; i < credits.Length - 1; i++)
-                //    credits[i].Draw();
-                //credits[credits.Length - 1].Draw(new Color(255, 255, 255, alpha) * (alpha / 255f));
-
-                //Color whiteWithScreenAlpha = new Color(255, 255, 255, screenAlpha) * (screenAlpha / 255f);
-                //RenderingDevice.SpriteBatch.Draw(gradient, topR, null, whiteWithScreenAlpha, 0, Vector2.Zero, SpriteEffects.None, 0);
-                //RenderingDevice.SpriteBatch.Draw(gradient, bottomR, null, whiteWithScreenAlpha, 0, Vector2.Zero, SpriteEffects.FlipVertically, 0);
-
-                if(player.State == MediaState.Playing)
-                    RenderingDevice.SpriteBatch.Draw(player.GetTexture(), new Rectangle(0, 0, (int)RenderingDevice.Width, (int)RenderingDevice.Height), Color.White);
-
+                RenderingDevice.SpriteBatch.DrawString(loader.BiggerFont, "Congratulations!",
+                    new Vector2(RenderingDevice.Width * 0.5f, RenderingDevice.Height * 0.15f), Color.White, 0,
+                    loader.BiggerFont.MeasureString("Congratulations!") * 0.5f, 1, SpriteEffects.None, 0);
+                
                 RenderingDevice.SpriteBatch.End();
-            }
-
-            protected void Reset()
-            {
-                onGDMReset(this, EventArgs.Empty);
             }
         }
         #endregion

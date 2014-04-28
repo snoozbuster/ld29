@@ -4,6 +4,7 @@ using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.Constraints.SingleEntity;
+using BEPUphysics.Entities;
 using BEPUphysics.UpdateableSystems;
 using BEPUphysicsDemos.AlternateMovement.Character;
 using ConversionHelper;
@@ -39,6 +40,8 @@ namespace LD29
 
         private List<TextureMissile> missiles = new List<TextureMissile>();
 
+        public Entity Entity { get { return character.CharacterController.Body; } }
+
         private static CollisionGroup noCollisionGroup = new CollisionGroup();
         static Player()
         {
@@ -50,6 +53,7 @@ namespace LD29
         {
             character = new CharacterControllerInput(GameManager.Space, Renderer.Camera, g);
             character.CharacterController.Body.CollisionInformation.CollisionRules.Group = GameModel.NormalGroup;
+            character.CharacterController.Body.Tag = this;
 
             dockTex = new Sprite(delegate { return g.Loader.Dock; }, new Vector2(RenderingDevice.Width / 2, RenderingDevice.Height * 0.95f), null, Sprite.RenderPoint.Center);
             font = g.Loader.Font;
@@ -105,6 +109,7 @@ namespace LD29
         {
             character.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
 
+            bool underwaterLastFrame = underwater;
             underwater = false;
             foreach(FluidVolume f in water)
                 if(f.BoundingBox.Max.X > Renderer.Camera.Position.X && f.BoundingBox.Min.X < Renderer.Camera.Position.X &&
@@ -114,6 +119,8 @@ namespace LD29
                     underwater = true;
                     break;
                 }
+            if(underwater != underwaterLastFrame)
+                Program.Game.Loader.Splash.Play();
 
             targetedTexture = null;
             GameModel targetedModel = null;
@@ -156,7 +163,7 @@ namespace LD29
                 } while(heldTextures[textureIndex] == null && originalIndex != textureIndex);
             }
 
-            if(targetedModel != null && canTakeTextures && targetedTexture != null && 
+            if(targetedModel != null && canTakeTextures && targetedTexture != null &&
                 ((Input.ControlScheme == ControlScheme.Keyboard && Input.CheckForMouseJustReleased(1)) ||
                 (Input.ControlScheme == ControlScheme.XboxController && Input.CheckXboxJustPressed(Microsoft.Xna.Framework.Input.Buttons.LeftTrigger))))
             {
@@ -176,6 +183,7 @@ namespace LD29
                 ((Input.ControlScheme == ControlScheme.Keyboard && Input.CheckForMouseJustReleased(2)) ||
                 (Input.ControlScheme == ControlScheme.XboxController && Input.CheckXboxJustPressed(Microsoft.Xna.Framework.Input.Buttons.RightTrigger))))
             {
+                Program.Game.Loader.ApplyTexture.Play();
                 GameTexture t = heldTextures[textureIndex];
                 GameTexture burstTex = new GameTexture("Burst", t.ActualTexture,
                     new PhysicsProperties(0, 0.5f, 0.5f, 10, false, true),
@@ -191,6 +199,10 @@ namespace LD29
                 heldTextures[textureIndex] = null;
                 compressTextureList();
             }
+            else if(((Input.ControlScheme == ControlScheme.Keyboard && Input.CheckForMouseJustReleased(1)) ||
+                (Input.ControlScheme == ControlScheme.XboxController && Input.CheckXboxJustPressed(Microsoft.Xna.Framework.Input.Buttons.LeftTrigger))) ||
+                (Input.ControlScheme == ControlScheme.Keyboard && Input.CheckForMouseJustReleased(2)))
+                Program.Game.Loader.InvalidApplicationRemovalGrab.Play();
         }
 
         private void giveTexture(TextureMissile missile)

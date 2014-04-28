@@ -103,7 +103,7 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         /// <param name="gamePadInput">The current frame's keyboard state.</param>
         public void Update(float dt)
         {
-            if (IsActive)
+            if(IsActive)
             {
                 //Note that the character controller's update method is not called here; this is because it is handled within its owning space.
                 //This method's job is simply to tell the character to move around.
@@ -168,12 +168,12 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
 
                 //Update grabber
 
-            if (((Input.ControlScheme == ControlScheme.XboxController && Input.CheckXboxJustPressed(Buttons.X)) ||
-                 (Input.ControlScheme == ControlScheme.Keyboard && Input.CheckKeyboardPress(Keys.E))) && !grabber.IsUpdating)
+                if(((Input.ControlScheme == ControlScheme.XboxController && Input.CheckXboxJustPressed(Buttons.X)) ||
+                     (Input.ControlScheme == ControlScheme.Keyboard && Input.CheckKeyboardPress(Keys.E))) && !grabber.IsUpdating)
                 {
                     //Find the earliest ray hit
                     RayCastResult raycastResult;
-                    if(Space.RayCast(new Ray(Renderer.Camera.Position, Renderer.Camera.WorldMatrix.Forward), 10, RayCastFilter, out raycastResult))
+                    if(Space.RayCast(new Ray(Renderer.Camera.Position, Renderer.Camera.WorldMatrix.Forward), 6, RayCastFilter, out raycastResult))
                     {
                         var entityCollision = raycastResult.HitObject as EntityCollidable;
                         //If there's a valid ray hit, then grab the connected object!
@@ -182,16 +182,21 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                             var tag = entityCollision.Entity.Tag as GameModel;
                             if(tag != null)
                             {
-                                tag.Texture.GameProperties.RayCastHit();
+                                tag.Texture.GameProperties.RayCastHit(tag.Texture.GameProperties);
                                 if(!tag.Texture.Wireframe && tag.Texture.GameProperties.Grabbable)
                                 {
                                     grabber.Setup(entityCollision.Entity, raycastResult.HitData.Location);
                                     grabDistance = raycastResult.HitData.T;
                                 }
+                                else
+                                    Program.Game.Loader.InvalidApplicationRemovalGrab.Play();
                             }
+                            else
+                                Program.Game.Loader.InvalidApplicationRemovalGrab.Play();
                         }
                     }
-
+                    else
+                        Program.Game.Loader.InvalidApplicationRemovalGrab.Play();
                 }
                 else if(grabber.IsUpdating)
                 {

@@ -1,5 +1,6 @@
 ﻿using Accelerated_Delivery_Win;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace LD29
     {
         private List<Texture2D> frames;
         private List<float> timeInSeconds;
+        private List<SoundEffect> sounds;
         private int currentIndex = 0;
         private Rectangle screenRect;
 
@@ -19,13 +21,17 @@ namespace LD29
 
         public bool Done { get { return currentIndex == frames.Count; } }
 
-        public AnimatedTexture(List<Texture2D> frames, List<float> timeInSeconds)
+        private SoundEffectInstance typingSound;
+
+        public AnimatedTexture(List<Texture2D> frames, List<float> timeInSeconds,
+            List<SoundEffect> sounds)
         {
-            if(frames.Count != timeInSeconds.Count)
-                throw new ArgumentException("frame and timeInSeconds must be the same length");
+            if(frames.Count != timeInSeconds.Count || frames.Count != sounds.Count || timeInSeconds.Count != sounds.Count)
+                throw new ArgumentException("frame, timeInSeconds, and sounds must all be the same length");
 
             this.frames = frames;
             this.timeInSeconds = timeInSeconds;
+            this.sounds = sounds;
 
             screenRect = new Rectangle(0, 0, (int)RenderingDevice.Width, (int)RenderingDevice.Height);
         }
@@ -39,12 +45,38 @@ namespace LD29
         {
             if(Done)
                 return;
-            
+
+            if(currentIndex == 0 && typingSound == null)
+            {
+                SoundEffectInstance e = sounds[currentIndex].CreateInstance();
+                if(sounds[currentIndex] == Program.Game.Loader.AnimationTyping)
+                {
+                    e.IsLooped = true;
+                    typingSound = e;
+                }
+                e.Play();
+            }
             timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
             if(timer > timeInSeconds[currentIndex])
             {
                 timer = 0;
                 currentIndex++;
+                if(currentIndex != sounds.Count)
+                    if(sounds[currentIndex] != null)
+                    {
+                        if(typingSound != null)
+                        {
+                            typingSound.Stop();
+                            typingSound = null;
+                        }
+                        SoundEffectInstance e = sounds[currentIndex].CreateInstance();
+                        if(sounds[currentIndex] == Program.Game.Loader.AnimationTyping)
+                        {
+                            e.IsLooped = true;
+                            typingSound = e;
+                        }
+                        e.Play();
+                    }
             }
         }
 

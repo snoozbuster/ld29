@@ -1,5 +1,6 @@
 ﻿using Accelerated_Delivery_Win;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections;
@@ -62,6 +63,7 @@ namespace LD29
         public Model Rubble;
         public Model Fridge;
         public Model Board;
+        public Model Trophy;
         #endregion
 
         #region model textures
@@ -77,7 +79,25 @@ namespace LD29
         public Texture2D PurpleDoorTexture;
         public Texture2D PurpleButtonTexture;
         public Texture2D SeecretTexture;
+        public Texture2D TrophyTexture;
         #endregion
+
+        #region sfx
+        public SoundEffect ApplyTexture;
+        public SoundEffect InvalidApplicationRemovalGrab;
+        public SoundEffect RemoveTexture;
+        public SoundEffect Splash;
+
+        public SoundEffect AnimationCan;
+        public SoundEffect AnimationHmm;
+        public SoundEffect AnimationTyping;
+        public SoundEffect AnimationWoosh;
+        public SoundEffect AnimationFlash;
+        public SoundEffect AnimationClatter;
+        public SoundEffect AnimationRustle;
+        #endregion
+
+        public SoundEffect HappyTunes;
 
         public Texture2D[] AnimationFrames;
 
@@ -88,7 +108,12 @@ namespace LD29
 
         public IEnumerator<float> GetEnumerator()
         {
-            totalItems = 9 + 2 + 17 + 13 + 31;
+            totalItems = 1 + 9 + 2 + 18 + 14 + 31 + 11;
+
+            #region audio
+            HappyTunes = content.Load<SoundEffect>("music/happy");
+            yield return progress();
+            #endregion
 
             #region Font
             Font = content.Load<SpriteFont>("font/font");
@@ -167,6 +192,8 @@ namespace LD29
             yield return progress();
             Board = content.Load<Model>("models/board");
             yield return progress();
+            Trophy = content.Load<Model>("models/trophy");
+            yield return progress();
             #endregion
 
             #region model textures
@@ -196,6 +223,8 @@ namespace LD29
             yield return progress();
             SeecretTexture = content.Load<Texture2D>("textures/lololol");
             yield return progress();
+            TrophyTexture = content.Load<Texture2D>("textures/trophy_tex");
+            yield return progress();
             #endregion
 
             #region animation
@@ -209,6 +238,32 @@ namespace LD29
                 AnimationFrames[i] = content.Load<Texture2D>("animation/" + (i < 10 ? "0" : "") + i);
                 yield return progress();
             }
+            #endregion
+
+            #region extra sfx
+            AnimationCan = content.Load<SoundEffect>("music/sfx/animation/can");
+            yield return progress();
+            AnimationHmm = content.Load<SoundEffect>("music/sfx/animation/hmm");
+            yield return progress();
+            AnimationFlash = content.Load<SoundEffect>("music/sfx/animation/ksh");
+            yield return progress();
+            AnimationTyping = content.Load<SoundEffect>("music/sfx/animation/typing");
+            yield return progress();
+            AnimationWoosh = content.Load<SoundEffect>("music/sfx/animation/whoosh");
+            yield return progress();
+            AnimationRustle = content.Load<SoundEffect>("music/sfx/animation/rustle");
+            yield return progress();
+            AnimationClatter = content.Load<SoundEffect>("music/sfx/animation/clatter");
+            yield return progress();
+
+            ApplyTexture = content.Load<SoundEffect>("music/sfx/apply");
+            yield return progress();
+            InvalidApplicationRemovalGrab = content.Load<SoundEffect>("music/sfx/invalid");
+            yield return progress();
+            RemoveTexture = content.Load<SoundEffect>("music/sfx/remove");
+            yield return progress();
+            Splash = content.Load<SoundEffect>("music/sfx/splash");
+            yield return progress();
             #endregion
         }
 

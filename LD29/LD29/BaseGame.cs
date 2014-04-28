@@ -17,6 +17,7 @@ using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.Constraints.SingleEntity;
 using BEPUphysics.Constraints.TwoEntity.Joints;
 using BEPUphysics.Constraints.SolverGroups;
+using BEPUphysics.CollisionRuleManagement;
 
 namespace LD29
 {
@@ -38,12 +39,15 @@ namespace LD29
         public SoundEffectInstance BGM;
         Player character;
 
-        List<FluidVolume> waters = new List<FluidVolume>();
+        public readonly List<FluidVolume> Waters = new List<FluidVolume>();
 
         private AnimatedTexture animation;
         private bool animating;
         protected float screenAlpha = 255;
         protected const float deltaA = 3;
+
+        private GameModel finalModel;
+        private float angle = 0;
 
         public BaseGame()
         {
@@ -175,7 +179,7 @@ namespace LD29
                         {
                             GameManager.Space.Update((float)(gameTime.ElapsedGameTime.TotalSeconds));
 
-                            character.Update(gameTime, waters);
+                            character.Update(gameTime, Waters);
 
                             if(IsActive)
                                 Mouse.SetPosition(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
@@ -184,6 +188,34 @@ namespace LD29
                 }
                 else if(GameManager.State != GameState.Ending && GameManager.State != GameState.GameOver && GameManager.State != GameState.Menuing_Lev)
                     IsMouseVisible = true;
+                if(GameManager.State == GameState.Ending)
+                {
+                    if(animating)
+                    {
+                        if(screenAlpha + deltaA * 1.5f > 255)
+                        {
+                            animating = false;
+                            finalModel.Entity.Position = Vector3.Zero;
+                            finalModel.Entity.IsAffectedByGravity = false;
+                            Renderer.Camera.Position = new BEPUutilities.Vector3(0, 5, 0.5f);
+                            Renderer.Camera.ViewDirection = new BEPUutilities.Vector3(0, -1, 0);
+                            Renderer.Add(finalModel);
+                            GameManager.Space.Add(finalModel);
+                            BGM.Stop();
+                            BGM = Loader.HappyTunes.CreateInstance();
+                            BGM.IsLooped = true;
+                            BGM.Play();
+                        }
+                        else
+                            screenAlpha += deltaA * 1.5f;
+                    }
+                    else
+                    {
+                        angle += 0.07f;
+                        finalModel.Entity.Orientation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, angle) * Quaternion.CreateFromAxisAngle(Vector3.UnitX, MathHelper.ToRadians(20));
+                        GameManager.Space.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+                    }
+                }
             }
 
             base.Update(gameTime);
@@ -215,8 +247,23 @@ namespace LD29
 
             if(GameManager.State == GameState.Running)
                 DrawScene(gameTime);
+            else if(GameManager.State == GameState.Ending)
+                DrawEnding(gameTime);
 
             base.Draw(gameTime);
+        }
+
+        private void DrawEnding(GameTime gameTime)
+        {
+            RenderingDevice.SpriteBatch.Begin();
+            RenderingDevice.SpriteBatch.Draw(Loader.EmptyTex, new Rectangle(0, 0, (int)RenderingDevice.Width, (int)RenderingDevice.Height),
+                new Color(0, 0, 0, screenAlpha) * (screenAlpha / 255f));
+            RenderingDevice.SpriteBatch.End();
+            if(!animating)
+            {
+                Renderer.Draw();
+                MenuHandler.Draw(gameTime);
+            }
         }
 
         public void DrawScene(GameTime gameTime)
@@ -243,39 +290,55 @@ namespace LD29
         {
             List<Texture2D> frames = new List<Texture2D>();
             List<float> timings = new List<float>();
+            List<SoundEffect> sounds = new List<SoundEffect>();
+            
             for(int i = 0; i < 4; i++)
             {
                 frames.Add(Loader.AnimationFrames[2]);
                 frames.Add(Loader.AnimationFrames[3]);
                 timings.Add(0.65f);
-                timings.Add(0.65f);
+                timings.Add(0.65f); 
+                sounds.Add(i == 0 ? Loader.AnimationTyping : null);
+                sounds.Add(null);
             }
             frames.Add(Loader.AnimationFrames[2]);
             frames.Add(Loader.AnimationFrames[3]);
             timings.Add(0.75f);
             timings.Add(1.2f);
+            sounds.Add(null);
+            sounds.Add(null);
             frames.Add(Loader.AnimationFrames[4]);
             timings.Add(3.5f);
+            sounds.Add(Loader.AnimationHmm);
             for(int i = 0; i < 3; i++)
             {
                 frames.Add(Loader.AnimationFrames[2]);
                 frames.Add(Loader.AnimationFrames[3]);
                 timings.Add(0.65f);
                 timings.Add(0.65f);
+                sounds.Add(i == 0 ? Loader.AnimationTyping : null);
+                sounds.Add(null);
             }
             for(int i = 5; i <= 10; i++)
             {
                 frames.Add(Loader.AnimationFrames[i]);
                 timings.Add(0.4f);
+                sounds.Add(i == 5 ? Loader.AnimationRustle : null);
             }
             frames.Add(Loader.AnimationFrames[12]);
             timings.Add(1.5f);
-            for(int i = 13; i <= 19; i++)
+            sounds.Add(null);
+            frames.Add(Loader.AnimationFrames[13]);
+            timings.Add(0.3f);
+            sounds.Add(Loader.AnimationCan);
+            for(int i = 14; i <= 19; i++)
             {
                 frames.Add(Loader.AnimationFrames[0]);
                 frames.Add(Loader.AnimationFrames[i]);
                 timings.Add(0.1f);
                 timings.Add(0.3f);
+                sounds.Add(Loader.AnimationFlash);
+                sounds.Add(i == 18 ? Loader.AnimationWoosh : null);
             }
             for(int i = 20; i <= 27; i++)
             {
@@ -283,34 +346,40 @@ namespace LD29
                     continue;
                 frames.Add(Loader.AnimationFrames[i]);
                 timings.Add(0.2f);
+                sounds.Add(i == 27 ? Loader.AnimationClatter : null);
             }
             frames.Add(Loader.AnimationFrames[28]);
             timings.Add(1.8f);
+            sounds.Add(null);
             frames.Add(Loader.AnimationFrames[0]);
             timings.Add(0.1f);
+            sounds.Add(Loader.AnimationFlash);
             for(int i = 29; i <= 31; i++)
             {
                 frames.Add(Loader.AnimationFrames[i]);
                 timings.Add(1.7f);
+                sounds.Add(i == 29 ? null : Loader.AnimationFlash);
             }
             frames.Add(Loader.AnimationFrames[32]);
             timings.Add(2.4f);
+            sounds.Add(Loader.AnimationWoosh);
             animating = true;
-            animation = new AnimatedTexture(frames, timings);
+            animation = new AnimatedTexture(frames, timings, sounds);
         }
 
         private void actualStart()
         {
+            createCharacter();
             makeWater();
             addModels();
-            createCharacter();
+            character.Activate();
         }
 
         private void makeWater()
         {
             var tris = new List<BEPUutilities.Vector3[]>();
-            float basinWidth = 20;
-            float basinLength = 15;
+            float basinWidth = 22;
+            float basinLength = 17;
             float waterHeight = 2f;
             BEPUutilities.Vector3 offset = new BEPUutilities.Vector3(40.42398f, 58.18201f, -5f);
 
@@ -328,12 +397,12 @@ namespace LD29
             FluidVolume water = new FluidVolume(Vector3.UnitZ, -9.81f, tris, waterHeight, 5f, 0.8f, 0.7f);
             water.CollisionRules.Group = GameModel.NormalGroup;
             Renderer.Add(Loader.Water, true);
-            waters.Add(water);
+            Waters.Add(water);
             GameManager.Space.Add(water);
 
             tris = new List<BEPUutilities.Vector3[]>();
-            basinWidth = 10;
-            basinLength = 20;
+            basinWidth = 12;
+            basinLength = 22;
             waterHeight = 2;
             offset = new BEPUutilities.Vector3(72.36915f, 21.0182f, -5f);
 
@@ -350,7 +419,7 @@ namespace LD29
             water = new FluidVolume(Vector3.UnitZ, -9.81f, tris, waterHeight, 5f, 0.8f, 0.7f);
             water.CollisionRules.Group = GameModel.NormalGroup;
             Renderer.Add(Loader.Water2, true);
-            waters.Add(water);
+            Waters.Add(water);
             GameManager.Space.Add(water);
         }
 
@@ -377,6 +446,73 @@ namespace LD29
             createFirstSetOfDoors(e);
             createSecondSetOfDoors(e);
             createThirdSetOfDoors(e);
+            createFourthSetOfDoors(e);
+
+            createFinalRoom();
+        }
+
+        private void createFinalRoom()
+        {
+            createBoard();
+
+            GameModel wireframe = new GameModel(new BEPUphysics.Entities.Prefabs.Sphere(new Vector3(79.73603f, 37.46315f, 6.6f), 1), Vector3.Zero, Loader.Ball,
+                new GameTexture("Wireframe", Loader.BallTexture,
+                    new PhysicsProperties(2.5f, 0.3f, 0.2f, 3f, false, true)) { Wireframe = true }, false);
+            Renderer.Add(wireframe);
+            GameManager.Space.Add(wireframe);
+            wireframe = new GameModel(new Vector3(74, 38.4f, 6.84868f), Loader.Fridge,
+                new GameTexture("Wireframe", Loader.FridgeTexture,
+                    new PhysicsProperties(null, null, null, null, false, true),
+                    new GameProperties(null, null, false, null, null)) { Wireframe = true }, false);
+            Renderer.Add(wireframe);
+            GameManager.Space.Add(wireframe);
+            wireframe = new GameModel(new Vector3(75.92088f, 37.90436f, 7.41689f), Loader.Rubble,
+                new GameTexture("Wireframe", Loader.RubbleTexture,
+                    new PhysicsProperties(null, null, null, null, false, true),
+                    new GameProperties(null, null, false, null, null)) { Wireframe = true }, false);
+            Renderer.Add(wireframe);
+            GameManager.Space.Add(wireframe);
+            wireframe = new GameModel(new Vector3(77.25307f, 38.5f, 8.36394f), Loader.Anvil,
+                new GameTexture("Wireframe", Loader.AnvilTexture,
+                    new PhysicsProperties(null, null, null, null, false, true),
+                    new GameProperties(null, null, false, null, null)) { Wireframe = true }, false);
+            Renderer.Add(wireframe);
+            GameManager.Space.Add(wireframe);
+            wireframe = new GameModel(new Vector3(78.99118f, 38.5f, 9.56803f), Loader.Orange,
+                new GameTexture("Wireframe", Loader.OrangeTexture,
+                    new PhysicsProperties(null, null, null, null, false, true),
+                    new GameProperties(null, null, false, null, null)) { Wireframe = true }, false);
+            Renderer.Add(wireframe);
+            GameManager.Space.Add(wireframe);
+            wireframe = new GameModel(new Vector3(80.3f, 37.85432f, 9.9f), Loader.Tree,
+                new GameTexture("Wireframe", Loader.TreeTexture,
+                    new PhysicsProperties(null, null, null, null, false, true),
+                    new GameProperties(null, null, false, null, null)) { Wireframe = true }, false);
+            wireframe.Entity.Orientation = Quaternion.CreateFromAxisAngle(Vector3.UnitX, MathHelper.PiOver2);
+            Renderer.Add(wireframe);
+            GameManager.Space.Add(wireframe);
+            wireframe = new GameModel(new Vector3(72.27454f, 36.96674f, 6.69829f), Loader.LeftDoorAlt,
+                new GameTexture("Wireframe", Loader.DoorTexture,
+                    new PhysicsProperties(null, null, null, null, false, true),
+                    new GameProperties(null, null, false, null, null)) { Wireframe = true }, false);
+            wireframe.Entity.Orientation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, MathHelper.PiOver2);
+            Renderer.Add(wireframe);
+            GameManager.Space.Add(wireframe);
+            wireframe = new GameModel(new Vector3(72.29584f, 36.02619f, 6.1818f), Loader.Button,
+                new GameTexture("Wireframe", Loader.ButtonTexture,
+                    new PhysicsProperties(null, null, null, null, false, true),
+                    new GameProperties(null, null, false, null, null)) { Wireframe = true }, false);
+            Renderer.Add(wireframe);
+            GameManager.Space.Add(wireframe);
+
+            GameModel trophy = new GameModel(new Vector3(83, 27, 11.5177f), Loader.Trophy,
+                new GameTexture("Trophy!", Loader.TrophyTexture,
+                    new PhysicsProperties(null, null, null, 10f, true, true),
+                    new GameProperties(gameProps => { if(gameProps.OwningModel.Model != Loader.Trophy) gameProps.SetStateObject(true); },
+                        gameProps => { if((bool)gameProps.UpdateStateObject == true) GameManager.State = GameState.Ending; finalModel = gameProps.OwningModel; animating = true; End(); }, true, null, null)));
+            trophy.Texture.GameProperties.SetStateObject(false);
+            Renderer.Add(trophy);
+            GameManager.Space.Add(trophy);
         }
 
         private void createFirstSetOfDoors(Entity e)
@@ -738,6 +874,166 @@ namespace LD29
             GameManager.Space.Add(button2);
         }
 
+        private void createFourthSetOfDoors(Entity e)
+        {
+            Func<GameTexture> getButtonTex = () =>
+            {
+                return new GameTexture("Button", Loader.ButtonTexture,
+                    new PhysicsProperties(null, null, null, 900, false, true),
+                    new GameProperties(null, null, false,
+                        (sender, other, pair) =>
+                        {
+                            EntityCollidable otherEntity = other as EntityCollidable;
+                            if(otherEntity == null || otherEntity.Entity == null)
+                                return;
+
+                            GameModel m = otherEntity.Entity.Tag as GameModel;
+                            if(m != null && m.Texture.FriendlyName == "Orange" && !m.Texture.Wireframe)
+                            {
+                                GameModel pThis = sender.Entity.Tag as GameModel;
+                                PrismaticJoint pMotor = pThis.Texture.GameProperties.UpdateStateObject as PrismaticJoint;
+                                pMotor.Motor.Settings.Servo.Goal = -0.07f;
+                            }
+                        },
+                        (sender, other, pair) =>
+                        {
+                            EntityCollidable otherEntity = other as EntityCollidable;
+                            if(otherEntity == null || otherEntity.Entity == null)
+                                return;
+
+                            GameModel m = otherEntity.Entity.Tag as GameModel;
+                            if(m != null && m.Texture.FriendlyName == "Orange" && !m.Texture.Wireframe)
+                            {
+                                GameModel pThis = sender.Entity.Tag as GameModel;
+                                PrismaticJoint pMotor = pThis.Texture.GameProperties.UpdateStateObject as PrismaticJoint;
+                                pMotor.Motor.Settings.Servo.Goal = 0;
+                            }
+                        }));
+            };
+
+            Entity button1Ent = new BEPUphysics.Entities.Prefabs.Box(new Vector3(53, 37, 6.1f + 0.075f), 0.55f, 0.55f, 0.1f);
+            PrismaticJoint lineJoint = new PrismaticJoint(e, button1Ent, button1Ent.Position, Vector3.UnitZ, button1Ent.Position);
+            lineJoint.IsActive = true;
+            lineJoint.Motor.Settings.Mode = BEPUphysics.Constraints.TwoEntity.Motors.MotorMode.Servomechanism;
+            lineJoint.Motor.IsActive = true;
+            lineJoint.Limit.Minimum = -0.07f;
+            lineJoint.Limit.Maximum = 0;
+            lineJoint.Limit.IsActive = true;
+
+            Entity button2Ent = new BEPUphysics.Entities.Prefabs.Box(new Vector3(53, 27, 6.1f + 0.075f), 0.55f, 0.55f, 0.1f);
+            PrismaticJoint lineJoint2 = new PrismaticJoint(e, button2Ent, button2Ent.Position, Vector3.UnitZ, button2Ent.Position);
+            lineJoint2.IsActive = true;
+            lineJoint2.Motor.Settings.Mode = BEPUphysics.Constraints.TwoEntity.Motors.MotorMode.Servomechanism;
+            lineJoint2.Motor.IsActive = true;
+            lineJoint2.Limit.Minimum = -0.07f;
+            lineJoint2.Limit.Maximum = 0;
+            lineJoint2.Limit.IsActive = true;
+
+            bool forceCloseDoors = false;
+            Action<GameProperties> doorUpdate = gameProps => {
+                if(gameProps.OwningModel.Model == Loader.LeftDoorAlt || gameProps.OwningModel.Model == Loader.RightDoorAlt)
+                {
+                    if(forceCloseDoors)
+                    {
+                        (gameProps.UpdateStateObject as RevoluteJoint).Motor.Settings.Servo.Goal = MathHelper.PiOver2;
+                        return;
+                    }
+
+                    if(lineJoint.IsActive && lineJoint.Motor.Settings.Servo.Goal != 0 &&
+                        lineJoint2.IsActive && lineJoint2.Motor.Settings.Servo.Goal != 0)
+                        (gameProps.UpdateStateObject as RevoluteJoint).Motor.Settings.Servo.Goal = 0;
+                    else
+                        (gameProps.UpdateStateObject as RevoluteJoint).Motor.Settings.Servo.Goal = MathHelper.PiOver2;
+                }
+            };
+
+            Func<GameTexture> getDoorTexture = () => {
+                return new GameTexture("Door", Loader.PurpleDoorTexture,
+                    new PhysicsProperties(null, null, null, 900, false, true),
+                    new GameProperties(doorUpdate, null, false, null, null,
+                        onRipped =>
+                        {
+                            (onRipped.Texture.GameProperties.UpdateStateObject as RevoluteJoint).Motor.Settings.Servo.Goal = MathHelper.PiOver2;
+                        },
+                        onApplied =>
+                        {
+                            onApplied.Entity.CollisionInformation.CollisionRules.Group = GameModel.FunctionalGroup;
+                        }));
+            };
+
+            GameModel button1 = new GameModel(button1Ent, Vector3.Zero, Loader.Button,
+                getButtonTex(), false);
+            button1.Entity.CollisionInformation.CollisionRules.Group = GameModel.FunctionalGroup;
+            GameManager.Space.Add(lineJoint);
+
+            GameModel button2 = new GameModel(button2Ent, Vector3.Zero, Loader.Button,
+                getButtonTex(), false);
+            button2.Entity.CollisionInformation.CollisionRules.Group = GameModel.FunctionalGroup;
+            GameManager.Space.Add(lineJoint2);
+
+            GameModel sphere1 = new GameModel(new BEPUphysics.Entities.Prefabs.Sphere(new Vector3(15, 38, 11.5f), 1), Vector3.Zero, Loader.Ball,
+                getDoorTexture());
+
+            GameModel sphere2 = new GameModel(new BEPUphysics.Entities.Prefabs.Sphere(new Vector3(15, 36, 11.5f), 1), Vector3.Zero, Loader.Ball,
+                getDoorTexture());
+
+            GameModel leftDoor = new GameModel(new Vector3(54.8f, 31.5f, 7), Loader.LeftDoorAlt,
+                new GameTexture("Wireframe", Loader.PurpleDoorTexture,
+                    new PhysicsProperties(null, null, null, 900, false, true),
+                    new GameProperties(null, null, false, null, null)) { Wireframe = true });
+            leftDoor.Entity.CollisionInformation.CollisionRules.Group = GameModel.FunctionalGroup;
+            RevoluteJoint angularJoint = new RevoluteJoint(e, leftDoor.Entity, leftDoor.Entity.Position + new BEPUutilities.Vector3(0, -0.5f, 0), Vector3.UnitZ);
+            angularJoint.IsActive = true;
+            angularJoint.Motor.Settings.Servo.Goal = MathHelper.PiOver2;
+            angularJoint.Motor.Settings.Mode = BEPUphysics.Constraints.TwoEntity.Motors.MotorMode.Servomechanism;
+            angularJoint.Motor.Basis.SetWorldAxes(Vector3.UnitZ, Vector3.UnitX);
+            angularJoint.Motor.IsActive = true;
+            GameManager.Space.Add(angularJoint);
+            sphere1.Texture.GameProperties.SetStateObject(angularJoint);
+            button1.Texture.GameProperties.SetStateObject(lineJoint);
+
+            GameModel rightDoor = new GameModel(new Vector3(54.8f, 32.5f, 7), Loader.RightDoorAlt,
+                new GameTexture("Wireframe", Loader.PurpleDoorTexture,
+                    new PhysicsProperties(null, null, null, 900, false, true),
+                    new GameProperties(null, null, false, null, null)) { Wireframe = true });
+            rightDoor.Entity.CollisionInformation.CollisionRules.Group = GameModel.FunctionalGroup;
+            angularJoint = new RevoluteJoint(e, rightDoor.Entity, rightDoor.Entity.Position - new BEPUutilities.Vector3(0, -0.5f, 0), Vector3.UnitZ);
+            angularJoint.IsActive = true;
+            angularJoint.Motor.Settings.Servo.Goal = MathHelper.PiOver2;
+            angularJoint.Motor.Settings.Mode = BEPUphysics.Constraints.TwoEntity.Motors.MotorMode.Servomechanism;
+            angularJoint.Motor.Basis.SetWorldAxes(-Vector3.UnitZ, Vector3.UnitX);
+            angularJoint.Motor.IsActive = true;
+            GameManager.Space.Add(angularJoint);
+            sphere2.Texture.GameProperties.SetStateObject(angularJoint);
+            button2.Texture.GameProperties.SetStateObject(lineJoint2);
+
+            Renderer.Add(leftDoor);
+            Renderer.Add(rightDoor);
+            Renderer.Add(button1);
+            Renderer.Add(button2);
+            Renderer.Add(sphere1);
+            Renderer.Add(sphere2);
+            GameManager.Space.Add(leftDoor);
+            GameManager.Space.Add(rightDoor);
+            GameManager.Space.Add(button1);
+            GameManager.Space.Add(button2);
+            GameManager.Space.Add(sphere1);
+            GameManager.Space.Add(sphere2);
+
+            Entity doorCloser = new BEPUphysics.Entities.Prefabs.Box(new Vector3(61.38556f, 31.87945f, 7.78949f), 0.1f, 4, 4);
+            doorCloser.CollisionInformation.Events.InitialCollisionDetected += (sender, other, pair) => {
+                var otherEntity = other as EntityCollidable;
+                if(otherEntity != null)
+                {
+                    var player = otherEntity.Entity.Tag as Player;
+                    if(player != null)
+                        forceCloseDoors = true;
+                }
+            };
+            CollisionRules.AddRule(doorCloser, character.Entity, CollisionRule.NoSolver);
+            GameManager.Space.Add(doorCloser);
+        }
+
         private void createRubble()
         {
             GameModel rubble = new GameModel(new Vector3(6.77804f, 55.90436f, -3.90114f), Loader.Rubble,
@@ -747,6 +1043,16 @@ namespace LD29
             rubble.Entity.CollisionInformation.CollisionRules.Group = GameModel.FunctionalGroup;
             Renderer.Add(rubble);
             GameManager.Space.Add(rubble);
+        }
+
+        private void createBoard()
+        {
+            GameModel board = new GameModel(new Vector3(81, 32, 7), Loader.Board,
+                new GameTexture("Wireframe", Loader.SeecretTexture,
+                    new PhysicsProperties(null, null, null, null, false, true),
+                    new GameProperties(null, null, false, null, null)), false);
+            Renderer.Add(board);
+            GameManager.Space.Add(board);
         }
 
         private void createFridges()
@@ -855,14 +1161,14 @@ namespace LD29
             anvil.Entity.Orientation = BEPUutilities.Quaternion.CreateFromAxisAngle(Vector3.UnitZ, MathHelper.PiOver4);
             Renderer.Add(anvil);
             GameManager.Space.Add(anvil);
-            anvil = new GameModel(new Vector3(18, 27, 9) + anvilOffset, Loader.Anvil,
+            anvil = new GameModel(new Vector3(18, 27, 10) + anvilOffset, Loader.Anvil,
                 new GameTexture("Anvil", Loader.AnvilTexture,
                     new PhysicsProperties(null, null, null, 15000, true, true),
                     new GameProperties(null, null, false, null, null)));
             anvil.Entity.Orientation = BEPUutilities.Quaternion.CreateFromAxisAngle(Vector3.UnitZ, MathHelper.ToRadians(200));
             Renderer.Add(anvil);
             GameManager.Space.Add(anvil);
-            anvil = new GameModel(new Vector3(15, 31, 9) + anvilOffset, Loader.Anvil,
+            anvil = new GameModel(new Vector3(15, 31, 10) + anvilOffset, Loader.Anvil,
                 new GameTexture("Anvil", Loader.AnvilTexture,
                     new PhysicsProperties(null, null, null, 15000, true, true),
                     new GameProperties(null, null, false, null, null)));
@@ -876,6 +1182,12 @@ namespace LD29
             GameModel orange = new GameModel(new BEPUphysics.Entities.Prefabs.Sphere(new Vector3(-2, 32, 3.3f), 0.2f), Vector3.Zero, Loader.Orange,
                 new GameTexture("Orange", Loader.OrangeTexture,
                     new PhysicsProperties(0.1f, null, null, 5f, true, true)));
+            Renderer.Add(orange);
+            GameManager.Space.Add(orange);
+            orange = new GameModel(new BEPUphysics.Entities.Prefabs.Sphere(new Vector3(0, 0, 0.3f), 0.2f), Vector3.Zero, Loader.Orange,
+                new GameTexture("???", Loader.SeecretTexture,
+                    new PhysicsProperties(null, null, null, null, false, true),
+                    new GameProperties(null, null, false, null, null)));
             Renderer.Add(orange);
             GameManager.Space.Add(orange);
             orange = new GameModel(new BEPUphysics.Entities.Prefabs.Sphere(new Vector3(22, 11, 6.3f), 0.2f), Vector3.Zero, Loader.Orange,
@@ -922,22 +1234,45 @@ namespace LD29
                     new GameProperties(null, null, false, null, null),
                     new GraphicsProperties(null, true)));
             tree.Entity.CollisionInformation.Shape.Volume = 0.5f;
-            GameModel tree2 = new GameModel(new Vector3(5, 36, 7.1269f), Loader.Tree,
+            Renderer.Add(tree);
+            GameManager.Space.Add(tree);
+            tree = new GameModel(new Vector3(5, 36, 7.1269f), Loader.Tree,
                 new GameTexture("Tree", Loader.TreeTexture,
                     new PhysicsProperties(null, 0.9f, 0.8f, null, true, null),
                     new GameProperties(null, null, false, null, null),
                     new GraphicsProperties(null, true)));
-            tree2.Entity.CollisionInformation.Shape.Volume = 0.5f;
+            tree.Entity.CollisionInformation.Shape.Volume = 0.5f;
             Renderer.Add(tree);
-            Renderer.Add(tree2);
             GameManager.Space.Add(tree);
-            GameManager.Space.Add(tree2);
+            tree = new GameModel(new Vector3(5, 62, -2.8731f), Loader.Tree,
+                new GameTexture("Tree", Loader.TreeTexture,
+                    new PhysicsProperties(null, 0.9f, 0.8f, null, true, null),
+                    new GameProperties(null, null, false, null, null),
+                    new GraphicsProperties(null, true)));
+            tree.Entity.CollisionInformation.Shape.Volume = 0.5f;
+            Renderer.Add(tree);
+            GameManager.Space.Add(tree);
+            tree = new GameModel(new Vector3(62.53115f, -23.71829f, -3 + 1.1269f), Loader.Tree,
+                new GameTexture("Tree", Loader.TreeTexture,
+                    new PhysicsProperties(null, 0.9f, 0.8f, null, true, null),
+                    new GameProperties(null, null, false, null, null),
+                    new GraphicsProperties(null, true)));
+            tree.Entity.CollisionInformation.Shape.Volume = 0.5f;
+            Renderer.Add(tree);
+            GameManager.Space.Add(tree);
+            tree = new GameModel(new Vector3(81.54448f, -15.96822f, -3 + 1.1269f), Loader.Tree,
+                new GameTexture("Tree", Loader.TreeTexture,
+                    new PhysicsProperties(null, 0.9f, 0.8f, null, true, null),
+                    new GameProperties(null, null, false, null, null),
+                    new GraphicsProperties(null, true)));
+            tree.Entity.CollisionInformation.Shape.Volume = 0.5f;
+            Renderer.Add(tree);
+            GameManager.Space.Add(tree);
         }
 
         private void createCharacter()
         {
             character = new Player(this);
-            character.Activate();
         }
 
         public void End()
@@ -945,14 +1280,14 @@ namespace LD29
             character.Deactivate();
             GameManager.Space.Clear();
             Renderer.Clear();
-            waters.Clear();
+            Waters.Clear();
         }
 
         #region windows
 #if WINDOWS
         protected override void OnActivated(object sender, EventArgs args)
         {
-            if(GameManager.PreviousState == GameState.Running)
+            if(GameManager.PreviousState == GameState.Running && GameManager.State != GameState.Ending)
                 GameManager.State = GameState.Running;
             BGM.Resume();
             BGM.Volume = 1;
@@ -962,7 +1297,7 @@ namespace LD29
 
         protected override void OnDeactivated(object sender, EventArgs args)
         {
-            if(GameManager.State == GameState.Running)
+            if(GameManager.State == GameState.Running && GameManager.State != GameState.Ending)
                 GameManager.State = GameState.Paused;
             BGM.Pause();
 

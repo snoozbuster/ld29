@@ -3,6 +3,7 @@ using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
+using BEPUphysics.UpdateableSystems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -34,6 +35,8 @@ namespace LD29
         public Vector3 Origin { get; protected set; }
 
         public readonly bool CanBeRipped;
+
+        private bool underwater;
 
         public GameModel(Vector3 origin, Model m, GameTexture t, bool rippable = true)
             :this(null, origin, m, t, rippable) { }
@@ -78,6 +81,7 @@ namespace LD29
             output.CurrentModel = null;
             Texture = new GameTexture("Wireframe", Texture.ActualTexture) { Wireframe = true };
             Entity.AngularVelocity = Entity.LinearVelocity = Vector3.Zero;
+            Program.Game.Loader.RemoveTexture.Play();
             return output;
         }
 
