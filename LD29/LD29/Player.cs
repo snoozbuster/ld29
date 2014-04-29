@@ -346,9 +346,13 @@ namespace LD29
                     if(!player.canTakeTextures) // we absorbed textures too fast
                     {
                         FollowPlayer = false;
-                        CollisionRules.AddRule(Model.Entity, player.character.CharacterController.Body, CollisionRule.NoBroadPhase);
                         Target = targetModel.Entity.Position;
                         linearMotor.Settings.Servo.Goal = Target;
+                        try
+                        {
+                            CollisionRules.AddRule(Model.Entity, targetModel.Entity, CollisionRule.NoSolver);
+                        }
+                        catch { }
                     }
                     else
                         player.giveTexture(this);
@@ -358,7 +362,11 @@ namespace LD29
                     if(!targetModel.Texture.Wireframe) // we launched textures too fast. turn around and go back to the player.
                     {
                         FollowPlayer = true;
-                        CollisionRules.AddRule(Model.Entity, player.character.CharacterController.Body, CollisionRule.NoSolver);
+                        try
+                        {
+                            CollisionRules.AddRule(Model.Entity, player.character.CharacterController.Body, CollisionRule.NoSolver);
+                        }
+                        catch { }
                         Target = player.character.CharacterController.Body.Position;
                         linearMotor.Settings.Servo.Goal = Target;
                     }

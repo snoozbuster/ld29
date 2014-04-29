@@ -445,7 +445,7 @@ namespace LD29
             {
                 if(Input.CurrentPad.IsConnected)
                 {
-                    GameManager.State = GameManager.PreviousState;
+                    Input.ContinueWithPad();
                     MediaSystem.PlayAll();
                 }
 #if WINDOWS
@@ -483,7 +483,7 @@ namespace LD29
             {
                 if(!Input.CurrentPad.IsConnected)
                 {
-                    GameManager.State = GameManager.PreviousState;
+                    Input.ContinueWithKeyboard();
                     MediaSystem.PlayAll();
                 }
                 if(Input.CheckXboxJustPressed(Buttons.Start) || Input.CheckXboxJustPressed(Buttons.A))

@@ -67,6 +67,7 @@ namespace LD29
         public Model Board;
         public Model Trophy;
         public Model Cage;
+        public Model DoorCloser;
         #endregion
 
         #region model textures
@@ -90,6 +91,7 @@ namespace LD29
         public SoundEffect InvalidApplicationRemovalGrab;
         public SoundEffect RemoveTexture;
         public SoundEffect Splash;
+        public SoundEffect Zap;
 
         public SoundEffect AnimationCan;
         public SoundEffect AnimationHmm;
@@ -111,7 +113,7 @@ namespace LD29
 
         public IEnumerator<float> GetEnumerator()
         {
-            totalItems = 1 + 10 + 2 + 19 + 14 + 31 + 11;
+            totalItems = 1 + 10 + 2 + 20 + 14 + 31 + 12;
 
             #region audio
             HappyTunes = content.Load<SoundEffect>("music/happy");
@@ -201,6 +203,8 @@ namespace LD29
             yield return progress();
             Cage = content.Load<Model>("models/cage");
             yield return progress();
+            DoorCloser = content.Load<Model>("models/doorcloser");
+            yield return progress();
             #endregion
 
             #region model textures
@@ -270,6 +274,8 @@ namespace LD29
             RemoveTexture = content.Load<SoundEffect>("music/sfx/remove");
             yield return progress();
             Splash = content.Load<SoundEffect>("music/sfx/splash");
+            yield return progress();
+            Zap = content.Load<SoundEffect>("music/sfx/zap");
             yield return progress();
             #endregion
         }

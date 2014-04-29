@@ -1039,11 +1039,18 @@ namespace LD29
                     {
                         forceCloseDoors = true;
                         player.EmancipateTextures();
+                        Loader.Zap.Play();
                     }
                 }
             };
             CollisionRules.AddRule(doorCloser, character.Entity, CollisionRule.NoSolver);
-            GameManager.Space.Add(doorCloser);
+            GameModel closer = new GameModel(doorCloser, Vector3.Zero, Loader.DoorCloser,
+                new GameTexture("Emancipator", Loader.EmancipatorTexture,
+                    new PhysicsProperties(null, null, null, null, false, null),
+                    new GameProperties(null, null, false, null, null),
+                    new GraphicsProperties(null, true)), false);
+            GameManager.Space.Add(closer);
+            Renderer.Add(closer);
         }
 
         private void createRubble()
@@ -1059,7 +1066,7 @@ namespace LD29
 
         private void createBoard()
         {
-            GameModel board = new GameModel(new Vector3(81, 32, 7), Loader.Board,
+            GameModel board = new GameModel(new Vector3(80.9f, 32, 7), Loader.Board,
                 new GameTexture("Wireframe", Loader.SeecretTexture,
                     new PhysicsProperties(null, null, null, null, false, true),
                     new GameProperties(null, null, false, null, null)) { Wireframe = true }, false);

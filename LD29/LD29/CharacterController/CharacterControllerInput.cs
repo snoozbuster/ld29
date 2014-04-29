@@ -186,6 +186,11 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                                 if(!tag.Texture.Wireframe && tag.Texture.GameProperties.Grabbable)
                                 {
                                     grabber.Setup(entityCollision.Entity, raycastResult.HitData.Location);
+                                    try
+                                    {
+                                        CollisionRules.AddRule(entityCollision.Entity, CharacterController.Body, CollisionRule.NoBroadPhase);
+                                    }
+                                    catch { }
                                     grabDistance = raycastResult.HitData.T;
                                 }
                                 else
@@ -202,7 +207,14 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
                 {
                     if((Input.ControlScheme == ControlScheme.XboxController && Input.CheckXboxJustPressed(Buttons.X)) ||
                         (Input.ControlScheme == ControlScheme.Keyboard && Input.CheckKeyboardPress(Keys.E)))
-                        grabber.Release();
+                    {
+                        try
+                        {
+                            CollisionRules.RemoveRule(grabber.Entity, CharacterController.Body);
+                        }
+                        catch { }
+                        grabber.Release(); 
+                    }
                     grabber.GoalPosition = Renderer.Camera.Position + Renderer.Camera.WorldMatrix.Forward * grabDistance;
                 }
                 #endregion
