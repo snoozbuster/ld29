@@ -197,6 +197,8 @@ namespace LD29
                             animating = false;
                             finalModel.Entity.Position = Vector3.Zero;
                             finalModel.Entity.IsAffectedByGravity = false;
+                            finalModel.Entity.Mass = float.NegativeInfinity;
+                            finalModel.Entity.AngularVelocity = finalModel.Entity.LinearVelocity = Vector3.Zero;
                             Renderer.Camera.Position = new BEPUutilities.Vector3(0, 5, 0.5f);
                             Renderer.Camera.ViewDirection = new BEPUutilities.Vector3(0, -1, 0);
                             Renderer.Add(finalModel);
@@ -455,9 +457,9 @@ namespace LD29
         {
             createBoard();
 
-            GameModel wireframe = new GameModel(new BEPUphysics.Entities.Prefabs.Sphere(new Vector3(79.73603f, 37.46315f, 6.6f), 1), Vector3.Zero, Loader.Ball,
+            GameModel wireframe = new GameModel(new BEPUphysics.Entities.Prefabs.Sphere(new Vector3(79.73603f, 37.46315f, 6.9f), 1), Vector3.Zero, Loader.Ball,
                 new GameTexture("Wireframe", Loader.BallTexture,
-                    new PhysicsProperties(2.5f, 0.3f, 0.2f, 3f, false, true)) { Wireframe = true }, false);
+                    new PhysicsProperties(null, null, null, null, false, true)) { Wireframe = true }, false);
             Renderer.Add(wireframe);
             GameManager.Space.Add(wireframe);
             wireframe = new GameModel(new Vector3(74, 38.4f, 6.84868f), Loader.Fridge,
@@ -505,11 +507,18 @@ namespace LD29
             Renderer.Add(wireframe);
             GameManager.Space.Add(wireframe);
 
-            GameModel trophy = new GameModel(new Vector3(83, 27, 11.5177f), Loader.Trophy,
+            GameModel cage = new GameModel(new Vector3(83, 29, 12.49821f), Loader.Cage,
+                new GameTexture("Cage", Loader.AnvilTexture,
+                    new PhysicsProperties(null, null, null, null, false, true),
+                    new GameProperties(null, null, false, null, null)) { Wireframe = true });
+            Renderer.Add(cage);
+            GameManager.Space.Add(cage);
+
+            GameModel trophy = new GameModel(new Vector3(83, 29, 12), Loader.Trophy,
                 new GameTexture("Trophy!", Loader.TrophyTexture,
                     new PhysicsProperties(null, null, null, 10f, true, true),
                     new GameProperties(gameProps => { if(gameProps.OwningModel.Model != Loader.Trophy) gameProps.SetStateObject(true); },
-                        gameProps => { if((bool)gameProps.UpdateStateObject == true) GameManager.State = GameState.Ending; finalModel = gameProps.OwningModel; animating = true; End(); }, true, null, null)));
+                        gameProps => { if((bool)gameProps.UpdateStateObject == true) { GameManager.State = GameState.Ending; finalModel = gameProps.OwningModel; animating = true; End(); } }, true, null, null)));
             trophy.Texture.GameProperties.SetStateObject(false);
             Renderer.Add(trophy);
             GameManager.Space.Add(trophy);
@@ -1027,7 +1036,10 @@ namespace LD29
                 {
                     var player = otherEntity.Entity.Tag as Player;
                     if(player != null)
+                    {
                         forceCloseDoors = true;
+                        player.EmancipateTextures();
+                    }
                 }
             };
             CollisionRules.AddRule(doorCloser, character.Entity, CollisionRule.NoSolver);
@@ -1036,7 +1048,7 @@ namespace LD29
 
         private void createRubble()
         {
-            GameModel rubble = new GameModel(new Vector3(6.77804f, 55.90436f, -3.90114f), Loader.Rubble,
+            GameModel rubble = new GameModel(new BEPUphysics.Entities.Prefabs.Box(new Vector3(6.77804f, 56.03858f, -3.90114f), 2.236f, 1.943f, 1.148f), Vector3.Zero, Loader.Rubble,
                 new GameTexture("Rubble", Loader.RubbleTexture,
                     new PhysicsProperties(null, null, null, null, false, true),
                     new GameProperties(null, null, false, null, null)));
@@ -1050,7 +1062,7 @@ namespace LD29
             GameModel board = new GameModel(new Vector3(81, 32, 7), Loader.Board,
                 new GameTexture("Wireframe", Loader.SeecretTexture,
                     new PhysicsProperties(null, null, null, null, false, true),
-                    new GameProperties(null, null, false, null, null)), false);
+                    new GameProperties(null, null, false, null, null)) { Wireframe = true }, false);
             Renderer.Add(board);
             GameManager.Space.Add(board);
         }
@@ -1252,7 +1264,7 @@ namespace LD29
             tree.Entity.CollisionInformation.Shape.Volume = 0.5f;
             Renderer.Add(tree);
             GameManager.Space.Add(tree);
-            tree = new GameModel(new Vector3(62.53115f, -23.71829f, -3 + 1.1269f), Loader.Tree,
+            tree = new GameModel(new Vector3(62.53115f, -23.71829f, -3), Loader.Tree,
                 new GameTexture("Tree", Loader.TreeTexture,
                     new PhysicsProperties(null, 0.9f, 0.8f, null, true, null),
                     new GameProperties(null, null, false, null, null),
@@ -1260,7 +1272,7 @@ namespace LD29
             tree.Entity.CollisionInformation.Shape.Volume = 0.5f;
             Renderer.Add(tree);
             GameManager.Space.Add(tree);
-            tree = new GameModel(new Vector3(81.54448f, -15.96822f, -3 + 1.1269f), Loader.Tree,
+            tree = new GameModel(new Vector3(81.54448f, -15.96822f, -3), Loader.Tree,
                 new GameTexture("Tree", Loader.TreeTexture,
                     new PhysicsProperties(null, 0.9f, 0.8f, null, true, null),
                     new GameProperties(null, null, false, null, null),

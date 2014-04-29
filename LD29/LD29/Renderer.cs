@@ -187,7 +187,7 @@ namespace LD29
                 currentEffect.Parameters["Texture"].SetValue(model.Texture.ActualTexture);
 
                 currentEffect.Parameters["xCamerasViewProjection"].SetValue(view * MathConverter.Convert(Camera.ProjectionMatrix));
-                currentEffect.Parameters["xWorld"].SetValue(mesh.ParentBone.Transform * entityWorld);// * Camera.World);
+                currentEffect.Parameters["xWorld"].SetValue(mesh.ParentBone.Transform * model.Transform * entityWorld);// * Camera.World);
                 currentEffect.Parameters["xPassThroughLighting"].SetValue(true);
                 //currentEffect.Parameters["xLightPos"].SetValue(lights.LightPosition);
                 //currentEffect.Parameters["xLightPower"].SetValue(0.4f);

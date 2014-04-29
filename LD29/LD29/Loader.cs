@@ -32,6 +32,8 @@ namespace LD29
 
         public Texture2D Dock;
         public Texture2D TabletopDotPNG;
+
+        public Texture2D Crosshair;
         #endregion
 
         #region Buttons
@@ -64,6 +66,7 @@ namespace LD29
         public Model Fridge;
         public Model Board;
         public Model Trophy;
+        public Model Cage;
         #endregion
 
         #region model textures
@@ -108,7 +111,7 @@ namespace LD29
 
         public IEnumerator<float> GetEnumerator()
         {
-            totalItems = 1 + 9 + 2 + 18 + 14 + 31 + 11;
+            totalItems = 1 + 10 + 2 + 19 + 14 + 31 + 11;
 
             #region audio
             HappyTunes = content.Load<SoundEffect>("music/happy");
@@ -155,6 +158,8 @@ namespace LD29
 
             Dock = content.Load<Texture2D>("gui/dock");
             yield return progress();
+            Crosshair = content.Load<Texture2D>("gui/crosshair");
+            yield return progress();
             #endregion
 
             #region models
@@ -193,6 +198,8 @@ namespace LD29
             Board = content.Load<Model>("models/board");
             yield return progress();
             Trophy = content.Load<Model>("models/trophy");
+            yield return progress();
+            Cage = content.Load<Model>("models/cage");
             yield return progress();
             #endregion
 

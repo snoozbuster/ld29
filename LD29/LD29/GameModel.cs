@@ -38,6 +38,8 @@ namespace LD29
 
         private bool underwater;
 
+        public Matrix Transform { get; private set; }
+
         public GameModel(Vector3 origin, Model m, GameTexture t, bool rippable = true)
             :this(null, origin, m, t, rippable) { }
 
@@ -49,6 +51,7 @@ namespace LD29
             CanBeRipped = rippable;
 
             Model.Tag = this;
+            Transform = Matrix.Identity;
 
             if(e == null)
             {
@@ -57,6 +60,7 @@ namespace LD29
                 ModelDataExtractor.GetVerticesAndIndicesFromModel(Model, out verts, out indices);
 
                 Entity = new MobileMesh(verts, indices, BEPUutilities.AffineTransform.Identity, MobileMeshSolidity.Solid, Texture.PhysicsProperties.Mass);
+                Transform = Matrix.CreateTranslation(-Entity.Position);
             }
             else
                 Entity = e;

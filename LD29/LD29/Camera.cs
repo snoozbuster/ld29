@@ -120,7 +120,8 @@ namespace BEPUphysicsDemos
         public Camera(BaseGame g)
         {
             //Position = new Vector3(-1, -16, 6);
-            Position = new Vector3(57, 31.5f, 7.5f);
+            //Position = new Vector3(57, 31.5f, 7.5f);
+            //Position = new Vector3(60, -20, -5);
             Yaw(-MathHelper.PiOver2);
             Pitch(0);
             ProjectionMatrix = MathConverter.Convert(Microsoft.Xna.Framework.Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, g.GraphicsDevice.Viewport.AspectRatio, .1f, 10000));

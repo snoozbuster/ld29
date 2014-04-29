@@ -30,6 +30,7 @@ namespace LD29
 
         private Sprite dockTex;
         private Texture2D underwaterTex;
+        private Texture2D crosshair;
         private SpriteFont font;
         private Model missileModel;
 
@@ -59,6 +60,7 @@ namespace LD29
             font = g.Loader.Font;
             underwaterTex = g.Loader.TabletopDotPNG;
             missileModel = g.Loader.Burst;
+            crosshair = g.Loader.Crosshair;
 
             int add = 0;
             for(int i = 0; i < drawingRectangles.Length; i++)
@@ -101,6 +103,9 @@ namespace LD29
                 newRect.Y -= 20;
                 RenderingDevice.SpriteBatch.Draw(heldTextures[textureIndex].ActualTexture, newRect, Color.White);
             }
+
+            RenderingDevice.SpriteBatch.Draw(crosshair, new Vector2(RenderingDevice.Width, RenderingDevice.Height) * 0.5f, null, Color.White,
+                0, new Vector2(crosshair.Width, crosshair.Height) * 0.5f, 1, SpriteEffects.None, 0);
 
             RenderingDevice.SpriteBatch.End();
         }
@@ -174,7 +179,7 @@ namespace LD29
                 GameModel m = new GameModel(targetedModel.Entity.Position, missileModel, burstTex, false);
                 m.Entity.CollisionInformation.CollisionRules.Group = noCollisionGroup;
                 CollisionRules.AddRule(m.Entity, character.CharacterController.Body, CollisionRule.NoSolver);
-                TextureMissile missile = new TextureMissile(m, character.CharacterController.Body.Position, t, this);
+                TextureMissile missile = new TextureMissile(m, character.CharacterController.Body.Position, t, this, targetedModel);
                 missiles.Add(missile);
                 Renderer.Add(missile.Model);
                 GameManager.Space.Add(missile);
@@ -191,7 +196,7 @@ namespace LD29
                 GameModel m = new GameModel(character.CharacterController.Body.Position, missileModel, burstTex, false);
                 m.Entity.CollisionInformation.CollisionRules.Group = noCollisionGroup;
                 CollisionRules.AddRule(m.Entity, targetedModel.Entity, CollisionRule.NoSolver);
-                TextureMissile missile = new TextureMissile(m, targetedModel.Entity.Position, t, this, targetedModel);
+                TextureMissile missile = new TextureMissile(m, targetedModel.Entity.Position, t, this, targetedModel, false);
                 missiles.Add(missile);
                 Renderer.Add(missile.Model);
                 GameManager.Space.Add(missile);
@@ -199,9 +204,9 @@ namespace LD29
                 heldTextures[textureIndex] = null;
                 compressTextureList();
             }
-            else if(((Input.ControlScheme == ControlScheme.Keyboard && Input.CheckForMouseJustReleased(1)) ||
-                (Input.ControlScheme == ControlScheme.XboxController && Input.CheckXboxJustPressed(Microsoft.Xna.Framework.Input.Buttons.LeftTrigger))) ||
-                (Input.ControlScheme == ControlScheme.Keyboard && Input.CheckForMouseJustReleased(2)))
+            else if((Input.ControlScheme == ControlScheme.Keyboard && (Input.CheckForMouseJustReleased(1)) || Input.CheckForMouseJustReleased(2)) ||
+                (Input.ControlScheme == ControlScheme.XboxController && (Input.CheckXboxJustPressed(Microsoft.Xna.Framework.Input.Buttons.LeftTrigger)
+                                                                     || Input.CheckXboxJustPressed(Microsoft.Xna.Framework.Input.Buttons.RightTrigger))))
                 Program.Game.Loader.InvalidApplicationRemovalGrab.Play();
         }
 
@@ -250,9 +255,16 @@ namespace LD29
             }
         }
 
+        public void EmancipateTextures()
+        {
+            for(int i = 0; i < heldTextures.Length; i++)
+                heldTextures[i] = null;
+            textureIndex = 2;
+        }
+
         public void Activate()
         {
-            //Renderer.Camera.Position = new BEPUutilities.Vector3(0, 0, 5);
+            Renderer.Camera.Position = new BEPUutilities.Vector3(0, 0, 5);
             character.Activate();
         }
 
@@ -282,9 +294,9 @@ namespace LD29
 
             private SingleEntityLinearMotor linearMotor;
 
-            public TextureMissile(GameModel model, Vector3 target, GameTexture carriedTex, Player p, GameModel targetModel = null)
+            public TextureMissile(GameModel model, Vector3 target, GameTexture carriedTex, Player p, GameModel targetModel, bool followPlayer = true)
             {
-                FollowPlayer = targetModel == null;
+                FollowPlayer = followPlayer;
                 player = p;
                 this.targetModel = targetModel;
 
@@ -330,11 +342,31 @@ namespace LD29
             {
                 var otherEntity = other as EntityCollidable;
                 if(otherEntity != null && FollowPlayer && otherEntity == player.character.CharacterController.Body.CollisionInformation)
-                    player.giveTexture(this);
+                {
+                    if(!player.canTakeTextures) // we absorbed textures too fast
+                    {
+                        FollowPlayer = false;
+                        CollisionRules.AddRule(Model.Entity, player.character.CharacterController.Body, CollisionRule.NoBroadPhase);
+                        Target = targetModel.Entity.Position;
+                        linearMotor.Settings.Servo.Goal = Target;
+                    }
+                    else
+                        player.giveTexture(this);
+                }
                 else if(otherEntity != null && !FollowPlayer)
                 {
-                    targetModel.GiveTexture(CarriedTex);
-                    player.remove(this);
+                    if(!targetModel.Texture.Wireframe) // we launched textures too fast. turn around and go back to the player.
+                    {
+                        FollowPlayer = true;
+                        CollisionRules.AddRule(Model.Entity, player.character.CharacterController.Body, CollisionRule.NoSolver);
+                        Target = player.character.CharacterController.Body.Position;
+                        linearMotor.Settings.Servo.Goal = Target;
+                    }
+                    else
+                    {
+                        targetModel.GiveTexture(CarriedTex);
+                        player.remove(this);
+                    }
                 }
             }
 
