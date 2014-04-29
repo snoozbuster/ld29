@@ -584,11 +584,13 @@ namespace LD29
 
             private readonly MenuControl start, instructions;
 
+            private bool can_click = false;
+
             public MainMenu()
             {
                 MenuButton quit;
                 start = new MenuButton(loader.startButton, delegate { GameManager.State = GameState.Running; timerInMilliseconds = 0; Program.Game.Start(); });
-                instructions = new MenuButton(loader.instructionsButton, delegate { GameManager.State = GameState.Menuing_HiS; });
+                instructions = new MenuButton(loader.instructionsButton, delegate { GameManager.State = GameState.Menuing_HiS; can_click = false; });
                 quit = new MenuButton(loader.quitButton, delegate { GameManager.State = GameState.Exiting; });
 
                 start.SetDirectionals(null, instructions, null, null);
@@ -659,7 +661,11 @@ namespace LD29
                             ReturnToPressStart();
                             return;
                         }
-                        base.Update(gameTime);
+                        if(Input.MouseState.LeftButton == ButtonState.Released)
+                            can_click = true;
+
+                        if(can_click)
+                            base.Update(gameTime);
                     }
                 }
             }
