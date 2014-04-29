@@ -27,11 +27,10 @@ namespace LD29
         private static PauseMenu pauseMenu;
         private static MainMenu mainMenu;
         private static GamePadDCMenu disconnectMenu;
-        private static EndingMenu gameOverMenu;
+        private static GameOverMenu gameOverMenu;
         private static ExitMenu exitMenu;
         private static GamePadQueryMenu queryMenu;
         private static EndingMenu endingMenu;
-        private static EndingMenu badEndingMenu;
         private static InstructionsMenu instructionsMenu;
 
         private static Loader loader;
@@ -46,6 +45,7 @@ namespace LD29
             queryMenu = new GamePadQueryMenu();
             instructionsMenu = new InstructionsMenu();
             endingMenu = new EndingMenu();
+            gameOverMenu = new GameOverMenu();
         }
 
         public static void Draw(GameTime gameTime)
@@ -91,8 +91,6 @@ namespace LD29
                     }
                     queryMenu.Draw(gameTime);
                     break;
-                case GameState.Menuing_Lev: badEndingMenu.Draw(gameTime);
-                    break;
                 case GameState.Menuing_HiS: instructionsMenu.Draw(gameTime);
                     break;
                 default: return;
@@ -126,9 +124,6 @@ namespace LD29
                 case GameState.Ending:
                     endingMenu.Update(gameTime);
                     return;
-                case GameState.Menuing_Lev:
-                    badEndingMenu.Update(gameTime);
-                    break;
                 case GameState.Menuing_HiS:
                     instructionsMenu.Update(gameTime);
                     break;
@@ -684,6 +679,44 @@ namespace LD29
         }
         #endregion
 
+        #region Game Over
+        private class GameOverMenu : Menu
+        {
+            public GameOverMenu()
+            {
+                MenuControl mainMenu, quit;
+                mainMenu = new MenuButton(loader.mainMenuButton, delegate { GameManager.State = GameState.MainMenu; Program.Game.End(); });
+                quit = new MenuButton(loader.pauseQuitButton, delegate { GameManager.State = GameState.Exiting; });
+                mainMenu.SetDirectionals(null, quit, null, null);
+                quit.SetDirectionals(mainMenu, null, null, null);
+
+                controlArray.Add(mainMenu);
+                controlArray.Add(quit);
+                selectedControl = mainMenu;
+                selectedControl.IsSelected = null;
+            }
+
+            public override void Draw(GameTime gameTime)
+            {
+                Program.Game.DrawScene(gameTime);
+
+                RenderingDevice.SpriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.LinearClamp, null, null);
+                RenderingDevice.SpriteBatch.Draw(loader.halfBlack, new Rectangle(0, 0, (int)RenderingDevice.Width, (int)RenderingDevice.Height), Color.White);
+                RenderingDevice.SpriteBatch.DrawString(loader.BiggerFont, "GAME OVER", new Vector2(RenderingDevice.Width * 0.5f, RenderingDevice.Height * 0.19f), Color.White, 0.0f, loader.BiggerFont.MeasureString("GAME OVER") * 0.5f, RenderingDevice.TextureScaleFactor, SpriteEffects.None, 0);
+                RenderingDevice.SpriteBatch.DrawString(loader.Font, "You destroyed the trophy. You are stuck here forever.", new Vector2(RenderingDevice.Width * 0.5f, RenderingDevice.Height * 0.35f), Color.White, 0.0f, loader.Font.MeasureString("You destroyed the trophy. You are stuck here forever.") * 0.5f, RenderingDevice.TextureScaleFactor, SpriteEffects.None, 0);
+
+                base.Draw(gameTime);
+
+                RenderingDevice.SpriteBatch.End();
+            }
+
+            public override void Update(GameTime gameTime)
+            {
+                base.Update(gameTime);
+            }
+        }
+        #endregion
+
         #region Exiting
         private class ExitMenu : Menu
         {
@@ -768,9 +801,9 @@ namespace LD29
             {
                 RenderingDevice.SpriteBatch.Begin();
 
-                RenderingDevice.SpriteBatch.DrawString(loader.BiggerFont, "Congratulations!",
-                    new Vector2(RenderingDevice.Width * 0.5f, RenderingDevice.Height * 0.15f), Color.White, 0,
-                    loader.BiggerFont.MeasureString("Congratulations!") * 0.5f, 1, SpriteEffects.None, 0);
+                RenderingDevice.SpriteBatch.DrawString(loader.BiggerFont, "  Congratulations!\nHere is your prize!",
+                    new Vector2(RenderingDevice.Width * 0.5f, RenderingDevice.Height * 0.12f), Color.White, 0,
+                    loader.BiggerFont.MeasureString("  Congratulations!\nHere is your prize!") * 0.5f, 1, SpriteEffects.None, 0);
                 
                 RenderingDevice.SpriteBatch.End();
             }

@@ -192,8 +192,9 @@ namespace LD29
                 {
                     if(animating)
                     {
-                        if(screenAlpha + deltaA * 1.5f > 255)
+                        if(screenAlpha + deltaA * 0.5f > 255)
                         {
+                            End();
                             animating = false;
                             finalModel.Entity.Position = Vector3.Zero;
                             finalModel.Entity.IsAffectedByGravity = false;
@@ -207,9 +208,10 @@ namespace LD29
                             BGM = Loader.HappyTunes.CreateInstance();
                             BGM.IsLooped = true;
                             BGM.Play();
+                            screenAlpha = 255;
                         }
                         else
-                            screenAlpha += deltaA * 1.5f;
+                            screenAlpha += deltaA * 0.5f;
                     }
                     else
                     {
@@ -244,7 +246,7 @@ namespace LD29
                 RenderingDevice.SpriteBatch.End();
                 loadingScreen.Draw();
             }
-            else
+            else if(GameManager.State != GameState.Ending)
                 MenuHandler.Draw(gameTime);
 
             if(GameManager.State == GameState.Running)
@@ -257,15 +259,16 @@ namespace LD29
 
         private void DrawEnding(GameTime gameTime)
         {
-            RenderingDevice.SpriteBatch.Begin();
-            RenderingDevice.SpriteBatch.Draw(Loader.EmptyTex, new Rectangle(0, 0, (int)RenderingDevice.Width, (int)RenderingDevice.Height),
-                new Color(0, 0, 0, screenAlpha) * (screenAlpha / 255f));
-            RenderingDevice.SpriteBatch.End();
-            if(!animating)
-            {
                 Renderer.Draw();
-                MenuHandler.Draw(gameTime);
-            }
+                if(animating)
+                {
+                    RenderingDevice.SpriteBatch.Begin();
+                    RenderingDevice.SpriteBatch.Draw(Loader.EmptyTex, new Rectangle(0, 0, (int)RenderingDevice.Width, (int)RenderingDevice.Height),
+                        new Color(0, 0, 0, screenAlpha) * (screenAlpha / 255f));
+                    RenderingDevice.SpriteBatch.End();
+                }
+                else
+                    MenuHandler.Draw(gameTime);
         }
 
         public void DrawScene(GameTime gameTime)
@@ -518,7 +521,7 @@ namespace LD29
                 new GameTexture("Trophy!", Loader.TrophyTexture,
                     new PhysicsProperties(null, null, null, 10f, true, true),
                     new GameProperties(gameProps => { if(gameProps.OwningModel.Model != Loader.Trophy) gameProps.SetStateObject(true); },
-                        gameProps => { if((bool)gameProps.UpdateStateObject == true) { GameManager.State = GameState.Ending; finalModel = gameProps.OwningModel; animating = true; End(); } }, true, null, null)));
+                        gameProps => { if((bool)gameProps.UpdateStateObject == true) { GameManager.State = GameState.Ending; finalModel = gameProps.OwningModel; animating = true; } }, true, null, null)));
             trophy.Texture.GameProperties.SetStateObject(false);
             Renderer.Add(trophy);
             GameManager.Space.Add(trophy);

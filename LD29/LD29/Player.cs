@@ -257,6 +257,9 @@ namespace LD29
 
         public void EmancipateTextures()
         {
+            if(heldTextures[2] != null && heldTextures[2].ActualTexture == Program.Game.Loader.TrophyTexture)
+                GameManager.State = GameState.GameOver;
+
             for(int i = 0; i < heldTextures.Length; i++)
                 heldTextures[i] = null;
             textureIndex = 2;
@@ -264,7 +267,7 @@ namespace LD29
 
         public void Activate()
         {
-            Renderer.Camera.Position = new BEPUutilities.Vector3(0, 0, 5);
+            //Renderer.Camera.Position = new BEPUutilities.Vector3(0, 0, 5);
             character.Activate();
         }
 
