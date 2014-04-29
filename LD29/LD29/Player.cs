@@ -267,7 +267,7 @@ namespace LD29
 
         public void Activate()
         {
-            //Renderer.Camera.Position = new BEPUutilities.Vector3(0, 0, 5);
+            Renderer.Camera.Position = new BEPUutilities.Vector3(0, 0, 5);
             character.Activate();
         }
 
