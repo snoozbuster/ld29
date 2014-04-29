@@ -36,12 +36,12 @@ namespace BEPUphysicsDemos
         public virtual void Update(float dt)
         {
             //Only turn if the mouse is controlled by the game.
-            if(Game.IsActive)
+            if(Game.IsActive && GameManager.State == GameState.Running)
             {
                 if(Input.ControlScheme == ControlScheme.Keyboard)
                 {
-                    Camera.Yaw((RenderingDevice.GraphicsDevice.Viewport.Width / 2 - Input.MouseState.X) * dt * .12f);
-                    Camera.Pitch(-(Input.MouseState.Y - RenderingDevice.GraphicsDevice.Viewport.Height / 2) * dt * .12f);
+                    Camera.Yaw((RenderingDevice.GraphicsDevice.Viewport.Width / 2 - Input.MouseState.X) * dt * .09f);
+                    Camera.Pitch(-(Input.MouseState.Y - RenderingDevice.GraphicsDevice.Viewport.Height / 2) * dt * .09f);
                 }
                 else
                 {
