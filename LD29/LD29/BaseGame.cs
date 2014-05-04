@@ -513,7 +513,7 @@ namespace LD29
             GameModel cage = new GameModel(new Vector3(83, 29, 12.49821f), Loader.Cage,
                 new GameTexture("Cage", Loader.AnvilTexture,
                     new PhysicsProperties(null, null, null, null, false, true),
-                    new GameProperties(null, null, false, null, null)) { Wireframe = true });
+                    new GameProperties(null, null, false, null, null)) { Wireframe = true }, false);
             Renderer.Add(cage);
             GameManager.Space.Add(cage);
 
@@ -1044,6 +1044,17 @@ namespace LD29
                         player.EmancipateTextures();
                         Loader.Zap.Play();
                     }
+                    else
+                    {
+                        var model = otherEntity.Entity.Tag as GameModel;
+                        if(model != null)
+                        {
+                            // EMANCIPATE
+                            model.Space.Remove(model);
+                            Renderer.Remove(model);
+                            character.StopGrabbing();
+                        }
+                    }
                 }
             };
             CollisionRules.AddRule(doorCloser, character.Entity, CollisionRule.NoSolver);
@@ -1237,12 +1248,14 @@ namespace LD29
                     new PhysicsProperties(0.1f, null, null, 5f, true, true)));
             Renderer.Add(orange);
             GameManager.Space.Add(orange);
+
+            // wireframe oranges in third room
             for(int i = 0; i < 3; i++)
                 for(int j = 0; j < 3; j++)
                 {
-                    orange = new GameModel(new BEPUphysics.Entities.Prefabs.Sphere(new Vector3(76 - i, -22 - j, -3f), 0.2f), Vector3.Zero, Loader.Orange,
-                        new GameTexture("Orange", Loader.OrangeTexture,
-                            new PhysicsProperties(0.1f, null, null, 5f, true, true)) { Wireframe = true });
+                    orange = new GameModel(new BEPUphysics.Entities.Prefabs.Sphere(new Vector3(76 - i, -22 - j, -3.5f), 0.2f), Vector3.Zero, Loader.Orange,
+                        new GameTexture("Wireframe", Loader.OrangeTexture,
+                            PhysicsProperties.WireframeProperties) { Wireframe = true });
                     Renderer.Add(orange);
                     GameManager.Space.Add(orange);
                 }

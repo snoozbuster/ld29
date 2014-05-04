@@ -261,8 +261,16 @@ namespace LD29
                 GameManager.State = GameState.GameOver;
 
             for(int i = 0; i < heldTextures.Length; i++)
-                heldTextures[i] = null;
+                if(heldTextures[i] != null && heldTextures[i].FriendlyName != "???")
+                    heldTextures[i] = null;
+
+            compressTextureList(); // in case we have the ??? texture
             textureIndex = 2;
+        }
+
+        public void StopGrabbing()
+        {
+            character.StopGrabbing();
         }
 
         public void Activate()

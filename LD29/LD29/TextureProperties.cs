@@ -87,7 +87,7 @@ namespace LD29
         /// The actual update function that will be called. Can't be hooked to Space.DuringForcesUpdatables.Starting directly;
         /// hook SpaceUpdate instead.
         /// </summary>
-        public Action<GameProperties> Update { get { if(update == null) update = x => { }; return update; } }
+        public Action<GameProperties> Update { get { if(update == null) update = x => { if(OwningModel.Texture.Wireframe) OwningModel.Entity.AngularVelocity = OwningModel.Entity.LinearVelocity = new BEPUutilities.Vector3(); }; return update; } }
         private Action<GameProperties> update;
 
         /// <summary>

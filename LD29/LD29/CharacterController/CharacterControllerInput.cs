@@ -225,5 +225,11 @@ namespace BEPUphysicsDemos.AlternateMovement.Character
         {
             return entry != CharacterController.Body.CollisionInformation && entry.CollisionRules.Personal <= CollisionRule.Normal;
         }
+
+        public void StopGrabbing()
+        {
+            if(IsGrabbing)
+                grabber.Release();
+        }
     }
 }

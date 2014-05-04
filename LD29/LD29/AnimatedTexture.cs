@@ -34,11 +34,26 @@ namespace LD29
             this.sounds = sounds;
 
             screenRect = new Rectangle(0, 0, (int)RenderingDevice.Width, (int)RenderingDevice.Height);
+
+            Program.Game.Activated += onActivated;
+            Program.Game.Deactivated += onDeactivated;
         }
 
         public void Reset()
         {
             timer = currentIndex = 0;
+        }
+
+        protected void onActivated(object sender, EventArgs args)
+        {
+            if(typingSound != null)
+                typingSound.Resume();
+        }
+
+        protected void onDeactivated(object sender, EventArgs args)
+        {
+            if(typingSound != null)
+                typingSound.Pause();
         }
 
         public void Update(GameTime gameTime)
